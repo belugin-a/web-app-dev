@@ -1,0 +1,79 @@
+[
+  {
+    "file": "hero.webp",
+    "source": "Закат в Ширяево.jpg",
+    "license": "CC BY-SA 4.0",
+    "author": "Aeroplant154",
+    "page": "https://commons.wikimedia.org/wiki/File:Закат_в_Ширяево.jpg"
+  },
+  {
+    "file": "route-molodecky.webp",
+    "source": "Molodecky mound 4314.jpg",
+    "license": "CC BY-SA 4.0",
+    "author": "ShinePhantom",
+    "page": "https://commons.wikimedia.org/wiki/File:Molodecky_mound_4314.jpg"
+  },
+  {
+    "file": "route-devya.webp",
+    "source": "Гора Девья.jpg",
+    "license": "CC BY-SA 4.0",
+    "author": "Kaa707",
+    "page": "https://commons.wikimedia.org/wiki/File:Гора_Девья.jpg"
+  },
+  {
+    "file": "route-strelnaya.webp",
+    "source": "Самарская Лука, гора Стрельная.jpg",
+    "license": "CC BY-SA 4.0",
+    "author": "W6whatever6r",
+    "page": "https://commons.wikimedia.org/wiki/File:Самарская_Лука,_гора_Стрельная.jpg"
+  },
+  {
+    "file": "gallery-1.webp",
+    "source": "Жигулёвские горы. Самарская область.jpg",
+    "license": "CC BY-SA 4.0",
+    "author": "Moneycantbuy",
+    "page": "https://commons.wikimedia.org/wiki/File:Жигулёвские_горы._Самарская_область.jpg"
+  },
+  {
+    "file": "gallery-2.webp",
+    "source": "Лес на возвышенности. Самарская лука.jpg",
+    "license": "CC BY-SA 4.0",
+    "author": "Wikimedia Commons",
+    "page": "https://commons.wikimedia.org/wiki/File:Лес_на_возвышенности._Самарская_лука.jpg"
+  },
+  {
+    "file": "gallery-3.webp",
+    "source": "Вид с Царева Кургана на Жигулёвские горы и Волгу.jpg",
+    "license": "CC BY-SA 4.0",
+    "author": "DmitryEz",
+    "page": "https://commons.wikimedia.org/wiki/File:Вид_с_Царева_Кургана_на_Жигулёвские_горы_и_Волгу.jpg"
+  },
+  {
+    "file": "gallery-4.webp",
+    "source": "Жигулёвские горы, Самарская Лука.JPG",
+    "license": "CC BY-SA 4.0",
+    "author": "NataliyaSS13",
+    "page": "https://commons.wikimedia.org/wiki/File:Жигулёвские_горы,_Самарская_Лука.JPG"
+  },
+  {
+    "file": "gallery-5.webp",
+    "source": "Массив Жигулей панорама.jpg",
+    "license": "CC BY-SA 3.0",
+    "author": "User: delphiski-oracul",
+    "page": "https://commons.wikimedia.org/wiki/File:Массив_Жигулей_панорама.jpg"
+  },
+  {
+    "file": "video-poster.webp",
+    "source": "Вдохновляющая панорама.jpg",
+    "license": "CC BY-SA 4.0",
+    "author": "Veskh442",
+    "page": "https://commons.wikimedia.org/wiki/File:Вдохновляющая_панорама.jpg"
+  },
+  {
+    "file": "clip.mp4",
+    "source": "сгенерировано из video-poster.webp (ffmpeg, эффект медленного наезда)",
+    "license": "—",
+    "author": "учебный проект",
+    "page": ""
+  }
+]

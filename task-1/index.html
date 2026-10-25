@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Самарская Лука — национальный парк на излучине Волги</title>
+  <meta name="description" content="Три тропы, смотровые площадки и аудиогид национального парка «Самарская Лука» в 40 минутах от Тольятти.">
+  <link rel="preload" href="assets/fonts/golos-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/img/hero.webp" as="image">
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#routes">Перейти к маршрутам</a>
+
+  <header class="header" id="header">
+    <div class="header__inner">
+      <a class="brand" href="#top" aria-label="Самарская Лука — на главную">
+        <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
+          <circle cx="20" cy="20" r="19" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 26c5.5 0 6.5-7 12-7s4.5-7 10-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="8" cy="26" r="2" fill="currentColor"/>
+        </svg>
+        <span class="brand__text">
+          <span class="brand__title">Самарская Лука</span>
+          <span class="brand__sub">национальный парк</span>
+        </span>
+      </a>
+
+      <nav class="nav" id="nav" aria-label="Основная навигация">
+        <a href="#routes">Маршруты</a>
+        <a href="#gallery">Галерея</a>
+        <a href="#media">Медиа</a>
+        <a href="#footer">Как добраться</a>
+      </nav>
+
+      <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span>
+      </button>
+    </div>
+    <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+  </header>
+
+  <main id="top">
+
+    <!-- 1. Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__media">
+        <img src="assets/img/hero.webp" alt="Закат над Волгой и Жигулёвскими горами" width="2000" height="1100" fetchpriority="high">
+      </div>
+      <div class="hero__scrim"></div>
+
+      <div class="hero__content">
+        <p class="eyebrow eyebrow--light">Национальный парк · Самарская область</p>
+        <h1 class="hero__title" id="hero-title">Там, где Волга<br><em>поворачивает</em></h1>
+        <p class="hero__lead">Жигулёвские горы, сосновые склоны и три тропы, с которых видно всю излучину. Час от Тольятти, два — от Самары.</p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#routes">
+            Выбрать маршрут
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn--ghost" href="#media">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+            Слушать аудиогид
+          </a>
+        </div>
+      </div>
+
+      <div class="hero__foot">
+        <span>3 маршрута · 2 аудиотрека · 1 видео</span>
+        <span class="hero__scroll">Листайте <i aria-hidden="true"></i></span>
+      </div>
+    </section>
+
+    <!-- 2. Маршруты -->
+    <section class="routes section" id="routes" aria-labelledby="routes-title">
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow">Маршруты</p>
+            <h2 class="h2" id="routes-title">Три тропы —<br>от часа до полудня</h2>
+          </div>
+          <p class="section__note">Все маршруты промаркированы, специальная подготовка не нужна. Обувь — по погоде.</p>
+        </div>
+
+        <ul class="cards" role="list">
+          <li class="card reveal">
+            <a class="card__link" href="#route-molodecky">
+              <span class="card__media">
+                <img src="assets/img/route-molodecky.webp" alt="Молодецкий курган над Волгой" width="900" height="680" loading="lazy">
+              </span>
+              <span class="card__body">
+                <span class="card__index">01</span>
+                <span class="card__title">Молодецкий курган</span>
+                <span class="card__meta"><span>2 км</span><span>1 час</span><span>легко</span></span>
+                <span class="card__text">Короткий подъём к смотровой площадке над Волгой.</span>
+                <span class="card__more">Подробнее
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+            </a>
+          </li>
+
+          <li class="card reveal">
+            <a class="card__link" href="#route-devya">
+              <span class="card__media">
+                <img src="assets/img/route-devya.webp" alt="Гора Девья и залив Жигулёвская Труба" width="900" height="680" loading="lazy">
+              </span>
+              <span class="card__body">
+                <span class="card__index">02</span>
+                <span class="card__title">Девья гора</span>
+                <span class="card__meta"><span>4 км</span><span>2 часа</span><span>средне</span></span>
+                <span class="card__text">Лесная тропа вдоль залива Жигулёвская Труба.</span>
+                <span class="card__more">Подробнее
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+            </a>
+          </li>
+
+          <li class="card reveal">
+            <a class="card__link" href="#route-strelnaya">
+              <span class="card__media">
+                <img src="assets/img/route-strelnaya.webp" alt="Вид с горы Стрельная на излучину Волги" width="900" height="680" loading="lazy">
+              </span>
+              <span class="card__body">
+                <span class="card__index">03</span>
+                <span class="card__title">Стрельная гора</span>
+                <span class="card__meta"><span>6 км</span><span>3 часа</span><span>сложнее</span></span>
+                <span class="card__text">Самая высокая точка парка — излучина как на ладони.</span>
+                <span class="card__more">Подробнее
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3. Галерея -->
+    <section class="gallery section" id="gallery" aria-labelledby="gallery-title">
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow">Галерея</p>
+            <h2 class="h2" id="gallery-title">Взгляд со стороны</h2>
+          </div>
+          <p class="section__note">Нажмите на фотографию, чтобы рассмотреть. Стрелки и Esc работают.</p>
+        </div>
+
+        <div class="gallery__grid" id="galleryGrid">
+          <button class="shot shot--wide" type="button" data-full="assets/img/gallery-1.webp" data-caption="Скалы над осенней долиной">
+            <img src="assets/img/gallery-1.webp" alt="Скалистый обрыв над осенней долиной" width="1400" height="1000" loading="lazy">
+          </button>
+          <button class="shot" type="button" data-full="assets/img/gallery-2.webp" data-caption="Осенний лес на склоне">
+            <img src="assets/img/gallery-2.webp" alt="Осенний лес на склоне Жигулёвских гор" width="800" height="640" loading="lazy">
+          </button>
+          <button class="shot" type="button" data-full="assets/img/gallery-3.webp" data-caption="Вид сквозь деревья">
+            <img src="assets/img/gallery-3.webp" alt="Вид на Волгу сквозь деревья" width="800" height="640" loading="lazy">
+          </button>
+          <button class="shot" type="button" data-full="assets/img/gallery-4.webp" data-caption="Волга с Жигулёвских гор">
+            <img src="assets/img/gallery-4.webp" alt="Волга и Жигулёвские горы с высоты" width="800" height="640" loading="lazy">
+          </button>
+          <button class="shot" type="button" data-full="assets/img/gallery-5.webp" data-caption="Жигулёвские ворота">
+            <img src="assets/img/gallery-5.webp" alt="Скалы Жигулёвских ворот" width="800" height="640" loading="lazy">
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Медиа -->
+    <section class="media section" id="media" aria-labelledby="media-title">
+      <div class="wrap media__inner">
+        <div class="media__audio">
+          <p class="eyebrow eyebrow--light">Аудиогид</p>
+          <h2 class="h2 h2--light" id="media-title">Послушать парк</h2>
+          <p class="media__lead">Два коротких трека для наушников: у воды и на подъёме. Без автозапуска — включайте, когда удобно.</p>
+
+          <div class="tracks" id="tracks">
+            <div class="track" data-src="assets/audio/guide-1.mp3">
+              <button class="track__play" type="button" aria-label="Слушать трек «У Волги»">
+                <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+                <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
+              </button>
+              <div class="track__info">
+                <div class="track__top">
+                  <span class="track__name">У Волги</span>
+                  <span class="track__time" data-time>0:00</span>
+                </div>
+                <div class="track__bar" data-bar><i data-fill></i></div>
+                <span class="track__hint">шум воды · 0:45</span>
+              </div>
+            </div>
+
+            <div class="track" data-src="assets/audio/guide-2.mp3">
+              <button class="track__play" type="button" aria-label="Слушать трек «На тропе»">
+                <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+                <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
+              </button>
+              <div class="track__info">
+                <div class="track__top">
+                  <span class="track__name">На тропе</span>
+                  <span class="track__time" data-time>0:00</span>
+                </div>
+                <div class="track__bar" data-bar><i data-fill></i></div>
+                <span class="track__hint">ветер в соснах · 0:38</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <figure class="media__video">
+          <button class="video" id="videoBtn" type="button" aria-label="Смотреть видео о парке">
+            <img src="assets/img/video-poster.webp" alt="Вечер над Волгой у Ширяева" width="1280" height="720" loading="lazy">
+            <span class="video__play" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+            </span>
+            <span class="video__badge">0:09</span>
+          </button>
+          <figcaption>Панорама излучины. Видео, 9 секунд.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 5. Подвал -->
+  <footer class="footer" id="footer">
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <span class="brand__title">Самарская Лука</span>
+        <p>Национальный парк на излучине Волги. Учебный проект: интерфейс, вёрстка и медиа собраны как демонстрация форматов подачи информации.</p>
+      </div>
+
+      <div class="footer__col">
+        <h3>Как добраться</h3>
+        <p>Тольятти → Жигулёвск, 40 минут на машине.<br>Самара → с. Ширяево, 2 часа, летом — по воде.</p>
+        <a href="#top">Вернуться наверх ↑</a>
+      </div>
+
+      <div class="footer__col">
+        <h3>Контакты</h3>
+        <p><a href="tel:+78482000000">+7 (8482) 00-00-00</a><br>
+           <a href="mailto:hello@samarskaya-luka.ru">hello@samarskaya-luka.ru</a></p>
+        <p class="footer__small">Пн–Вс, 8:00–20:00</p>
+      </div>
+    </div>
+
+    <div class="wrap footer__bottom">
+      <span>© 2026 · учебный макет</span>
+      <span>Фото: Wikimedia Commons, CC BY-SA 3.0 / 4.0 · шрифт Golos Text</span>
+    </div>
+  </footer>
+
+  <!-- Лайтбокс -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр фотографии" hidden>
+    <button class="lightbox__close" type="button" aria-label="Закрыть">×</button>
+    <button class="lightbox__nav lightbox__nav--prev" type="button" aria-label="Предыдущая">←</button>
+    <figure class="lightbox__figure">
+      <img id="lightboxImg" src="" alt="">
+      <figcaption id="lightboxCaption"></figcaption>
+    </figure>
+    <button class="lightbox__nav lightbox__nav--next" type="button" aria-label="Следующая">→</button>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
