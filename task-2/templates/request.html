@@ -5,6 +5,10 @@
 {% block content %}
   <section class="section">
     <div class="container container--narrow">
+      {% if my_request %}
+        {% include "_notice.html" %}
+      {% endif %}
+
       <h1 class="page-title">Заявка на расчёт строительства</h1>
       <p class="page-lede">
         Заполните поля и приложите план дома в PDF (не больше 1 МБ).

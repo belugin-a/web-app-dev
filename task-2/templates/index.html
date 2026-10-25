@@ -3,6 +3,12 @@
 {% block title %}Свой Дом — строительство домов под ключ{% endblock %}
 
 {% block content %}
+  {% if my_request %}
+    <div class="container">
+      {% include "_notice.html" %}
+    </div>
+  {% endif %}
+
   <section class="hero">
     <div class="container hero__inner">
       <p class="eyebrow">Частные дома под ключ</p>

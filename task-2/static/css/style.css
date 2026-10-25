@@ -170,6 +170,22 @@ img, svg { max-width: 100%; height: auto; }
   box-shadow: inset 0 -6px 0 -2px var(--clay);
 }
 
+.site-header__brand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-4);
+}
+
+.site-header__hello {
+  max-width: 26ch;
+  overflow: hidden;
+  font-size: 14px;
+  color: var(--ink-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .nav__list {
   display: flex;
   flex-wrap: wrap;
@@ -552,6 +568,40 @@ textarea.input {
 }
 
 .file-link p + p { margin-top: var(--space-3); }
+
+/* ---------- 12.4. Напоминание о заявке из сессии ---------- */
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  margin-block: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  font-size: 14.5px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--clay);
+  border-radius: var(--radius-sm);
+}
+
+.notice__text { margin: 0; }
+.notice__text a { font-weight: 600; }
+.notice__reset { margin: 0; }
+
+.link-button {
+  min-height: 44px;
+  padding: 0;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.link-button:hover { color: var(--danger); }
 
 /* ---------- 13. Подвал ---------- */
 .site-footer {

@@ -1,0 +1,9 @@
+<aside class="notice">
+  <p class="notice__text">
+    Вы отправили <a href="{{ url_for('success', request_id=my_request.id) }}">заявку</a>
+    {{ my_request.created_at|dt }}. Скоро мы с вами свяжемся.
+  </p>
+  <form class="notice__reset" action="{{ url_for('reset_session') }}" method="post">
+    <button class="link-button" type="submit">Это не мои заявки</button>
+  </form>
+</aside>
