@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Заявка на расчёт — Свой Дом{% endblock %}
+
+{% block content %}
+  <section>
+    <h1>Заявка на расчёт строительства</h1>
+    <p>
+      Заполните поля и приложите план дома в PDF (не больше 1 МБ).
+      Поля, отмеченные <span aria-hidden="true">*</span>, обязательны.
+    </p>
+
+    <form action="{{ url_for('request_page') }}" method="post" enctype="multipart/form-data">
+
+      <p>
+        <label for="name">Имя <span aria-hidden="true">*</span></label><br>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          minlength="2"
+          maxlength="60"
+          autocomplete="name"
+          aria-describedby="name-hint">
+        <br>
+        <small id="name-hint">Как к вам обращаться. От 2 до 60 символов.</small>
+      </p>
+
+      <p>
+        <label for="phone">Телефон <span aria-hidden="true">*</span></label><br>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          required
+          inputmode="tel"
+          pattern="[\d\s()+-]{10,18}"
+          placeholder="+7 (900) 000-00-00"
+          autocomplete="tel"
+          aria-describedby="phone-hint">
+        <br>
+        <small id="phone-hint">10–11 цифр. Например: +7 (900) 123-45-67.</small>
+      </p>
+
+      <p>
+        <label for="email">E-mail <span aria-hidden="true">*</span></label><br>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          maxlength="120"
+          autocomplete="email"
+          placeholder="you@example.ru"
+          aria-describedby="email-hint">
+        <br>
+        <small id="email-hint">Пришлём на этот адрес смету.</small>
+      </p>
+
+      <p>
+        <label for="comment">Комментарий</label><br>
+        <textarea
+          id="comment"
+          name="comment"
+          rows="5"
+          maxlength="1000"
+          aria-describedby="comment-hint"></textarea>
+        <br>
+        <small id="comment-hint">Необязательно. Площадь, этажность, пожелания. До 1000 символов.</small>
+      </p>
+
+      <p>
+        <label for="plan">План дома (PDF) <span aria-hidden="true">*</span></label><br>
+        <input
+          type="file"
+          id="plan"
+          name="plan"
+          required
+          accept=".pdf,application/pdf"
+          aria-describedby="plan-hint">
+        <br>
+        <small id="plan-hint">Один файл в формате PDF, не больше 1 МБ.</small>
+      </p>
+
+      <p>
+        <button type="submit">Отправить заявку</button>
+      </p>
+
+    </form>
+
+    <p><a href="{{ url_for('index') }}">← Вернуться на главную</a></p>
+  </section>
+{% endblock %}

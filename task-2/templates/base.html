@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Свой Дом — строительство домов под ключ{% endblock %}</title>
+  <meta name="description" content="Строим частные дома под ключ: фундамент, коробка, кровля, отделка. Расчёт стоимости по вашему плану.">
+</head>
+<body>
+
+  <header>
+    <p><a href="{{ url_for('index') }}">Свой Дом</a></p>
+    <nav aria-label="Основная навигация">
+      <ul>
+        <li><a href="{{ url_for('index') }}#services">Услуги</a></li>
+        <li><a href="{{ url_for('index') }}#contacts">Контакты</a></li>
+        <li><a href="{{ url_for('request_page') }}">Оставить заявку</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer id="contacts">
+    <h2>Контакты</h2>
+    <address>
+      Самара, ул. Примерная, 1<br>
+      Телефон: <a href="tel:+79000000000">+7 (900) 000-00-00</a><br>
+      E-mail: <a href="mailto:info@example.ru">info@example.ru</a>
+    </address>
+    <p><small>Учебный проект. Контакты и цены демонстрационные.</small></p>
+  </footer>
+
+</body>
+</html>
