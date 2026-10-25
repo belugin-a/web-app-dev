@@ -5,10 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Самарская Лука — национальный парк на излучине Волги</title>
   <meta name="description" content="Три тропы, смотровые площадки и аудиогид национального парка «Самарская Лука» в 40 минутах от Тольятти.">
+  <meta name="theme-color" content="#F6F2E9">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="Самарская Лука — национальный парк на излучине Волги">
+  <meta property="og:description" content="Три тропы, смотровые площадки и аудиогид национального парка «Самарская Лука» в 40 минутах от Тольятти.">
+  <meta property="og:image" content="assets/img/hero.webp">
+  <meta property="og:image:alt" content="Закат над Волгой и Жигулёвскими горами">
+  <meta name="twitter:card" content="summary_large_image">
+
   <link rel="preload" href="assets/fonts/golos-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/img/hero.webp" as="image">
+  <link rel="preload" href="assets/img/hero.webp" as="image"
+        imagesrcset="assets/img/hero-1200.webp 1200w, assets/img/hero.webp 2000w"
+        imagesizes="100vw">
   <link rel="stylesheet" href="assets/fonts/fonts.css">
   <link rel="stylesheet" href="css/style.css">
+  <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
   <a class="skip-link" href="#routes">Перейти к маршрутам</a>
@@ -46,7 +60,10 @@
     <!-- 1. Hero -->
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero__media">
-        <img src="assets/img/hero.webp" alt="Закат над Волгой и Жигулёвскими горами" width="2000" height="1100" fetchpriority="high">
+        <img src="assets/img/hero.webp"
+             srcset="assets/img/hero-1200.webp 1200w, assets/img/hero.webp 2000w"
+             sizes="100vw"
+             alt="Закат над Волгой и Жигулёвскими горами" width="2000" height="1100" fetchpriority="high">
       </div>
       <div class="hero__scrim"></div>
 
@@ -84,10 +101,13 @@
         </div>
 
         <ul class="cards" role="list">
-          <li class="card reveal">
+          <li class="card reveal" id="route-molodecky">
             <a class="card__link" href="#route-molodecky">
               <span class="card__media">
-                <img src="assets/img/route-molodecky.webp" alt="Молодецкий курган над Волгой" width="900" height="680" loading="lazy">
+                <img src="assets/img/route-molodecky.webp"
+                     srcset="assets/img/route-molodecky-450.webp 450w, assets/img/route-molodecky.webp 900w"
+                     sizes="(max-width: 640px) 92vw, (max-width: 820px) 42vw, (max-width: 1080px) 30vw, 360px"
+                     alt="Молодецкий курган над Волгой" width="900" height="680" loading="lazy" decoding="async">
               </span>
               <span class="card__body">
                 <span class="card__index">01</span>
@@ -101,10 +121,13 @@
             </a>
           </li>
 
-          <li class="card reveal">
+          <li class="card reveal" id="route-devya">
             <a class="card__link" href="#route-devya">
               <span class="card__media">
-                <img src="assets/img/route-devya.webp" alt="Гора Девья и залив Жигулёвская Труба" width="900" height="680" loading="lazy">
+                <img src="assets/img/route-devya.webp"
+                     srcset="assets/img/route-devya-450.webp 450w, assets/img/route-devya.webp 900w"
+                     sizes="(max-width: 640px) 92vw, (max-width: 820px) 42vw, (max-width: 1080px) 30vw, 360px"
+                     alt="Гора Девья и залив Жигулёвская Труба" width="900" height="680" loading="lazy" decoding="async">
               </span>
               <span class="card__body">
                 <span class="card__index">02</span>
@@ -118,10 +141,13 @@
             </a>
           </li>
 
-          <li class="card reveal">
+          <li class="card reveal" id="route-strelnaya">
             <a class="card__link" href="#route-strelnaya">
               <span class="card__media">
-                <img src="assets/img/route-strelnaya.webp" alt="Вид с горы Стрельная на излучину Волги" width="900" height="680" loading="lazy">
+                <img src="assets/img/route-strelnaya.webp"
+                     srcset="assets/img/route-strelnaya-450.webp 450w, assets/img/route-strelnaya.webp 900w"
+                     sizes="(max-width: 640px) 92vw, (max-width: 820px) 42vw, (max-width: 1080px) 30vw, 360px"
+                     alt="Вид с горы Стрельная на излучину Волги" width="900" height="680" loading="lazy" decoding="async">
               </span>
               <span class="card__body">
                 <span class="card__index">03</span>
@@ -151,19 +177,34 @@
 
         <div class="gallery__grid" id="galleryGrid">
           <button class="shot shot--wide" type="button" data-full="assets/img/gallery-1.webp" data-caption="Скалы над осенней долиной">
-            <img src="assets/img/gallery-1.webp" alt="Скалистый обрыв над осенней долиной" width="1400" height="1000" loading="lazy">
+            <img src="assets/img/gallery-1.webp"
+                 srcset="assets/img/gallery-1-400.webp 400w, assets/img/gallery-1-800.webp 800w, assets/img/gallery-1.webp 1100w"
+                 sizes="(max-width: 820px) 94vw, 566px"
+                 alt="Скалистый обрыв над осенней долиной" width="1100" height="786" loading="lazy" decoding="async">
           </button>
           <button class="shot" type="button" data-full="assets/img/gallery-2.webp" data-caption="Осенний лес на склоне">
-            <img src="assets/img/gallery-2.webp" alt="Осенний лес на склоне Жигулёвских гор" width="800" height="640" loading="lazy">
+            <img src="assets/img/gallery-2.webp"
+                 srcset="assets/img/gallery-2-400.webp 400w, assets/img/gallery-2-600.webp 600w, assets/img/gallery-2.webp 800w"
+                 sizes="(max-width: 820px) 46vw, 272px"
+                 alt="Осенний лес на склоне Жигулёвских гор" width="800" height="640" loading="lazy" decoding="async">
           </button>
           <button class="shot" type="button" data-full="assets/img/gallery-3.webp" data-caption="Вид сквозь деревья">
-            <img src="assets/img/gallery-3.webp" alt="Вид на Волгу сквозь деревья" width="800" height="640" loading="lazy">
+            <img src="assets/img/gallery-3.webp"
+                 srcset="assets/img/gallery-3-400.webp 400w, assets/img/gallery-3-600.webp 600w, assets/img/gallery-3.webp 800w"
+                 sizes="(max-width: 820px) 46vw, 272px"
+                 alt="Вид на Волгу сквозь деревья" width="800" height="640" loading="lazy" decoding="async">
           </button>
           <button class="shot" type="button" data-full="assets/img/gallery-4.webp" data-caption="Волга с Жигулёвских гор">
-            <img src="assets/img/gallery-4.webp" alt="Волга и Жигулёвские горы с высоты" width="800" height="640" loading="lazy">
+            <img src="assets/img/gallery-4.webp"
+                 srcset="assets/img/gallery-4-400.webp 400w, assets/img/gallery-4-600.webp 600w, assets/img/gallery-4.webp 800w"
+                 sizes="(max-width: 820px) 46vw, 272px"
+                 alt="Волга и Жигулёвские горы с высоты" width="800" height="640" loading="lazy" decoding="async">
           </button>
           <button class="shot" type="button" data-full="assets/img/gallery-5.webp" data-caption="Жигулёвские ворота">
-            <img src="assets/img/gallery-5.webp" alt="Скалы Жигулёвских ворот" width="800" height="640" loading="lazy">
+            <img src="assets/img/gallery-5.webp"
+                 srcset="assets/img/gallery-5-400.webp 400w, assets/img/gallery-5-600.webp 600w, assets/img/gallery-5.webp 800w"
+                 sizes="(max-width: 820px) 46vw, 272px"
+                 alt="Скалы Жигулёвских ворот" width="800" height="640" loading="lazy" decoding="async">
           </button>
         </div>
       </div>
@@ -188,7 +229,9 @@
                   <span class="track__name">У Волги</span>
                   <span class="track__time" data-time>0:00</span>
                 </div>
-                <div class="track__bar" data-bar><i data-fill></i></div>
+                <div class="track__bar" data-bar role="slider" tabindex="0"
+                     aria-label="Перемотка трека «У Волги»"
+                     aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0:00"><i data-fill></i></div>
                 <span class="track__hint">шум воды · 0:45</span>
               </div>
             </div>
@@ -203,7 +246,9 @@
                   <span class="track__name">На тропе</span>
                   <span class="track__time" data-time>0:00</span>
                 </div>
-                <div class="track__bar" data-bar><i data-fill></i></div>
+                <div class="track__bar" data-bar role="slider" tabindex="0"
+                     aria-label="Перемотка трека «На тропе»"
+                     aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0:00"><i data-fill></i></div>
                 <span class="track__hint">ветер в соснах · 0:38</span>
               </div>
             </div>
@@ -258,7 +303,7 @@
     <button class="lightbox__close" type="button" aria-label="Закрыть">×</button>
     <button class="lightbox__nav lightbox__nav--prev" type="button" aria-label="Предыдущая">←</button>
     <figure class="lightbox__figure">
-      <img id="lightboxImg" src="" alt="">
+      <img id="lightboxImg" alt="">
       <figcaption id="lightboxCaption"></figcaption>
     </figure>
     <button class="lightbox__nav lightbox__nav--next" type="button" aria-label="Следующая">→</button>

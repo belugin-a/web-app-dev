@@ -13,6 +13,7 @@
   --sand:       #E4DCC9;
   --line:       #DAD3C2;
   --clay:       #C0723B;
+  --clay-ink:   #A0562A;
   --clay-soft:  #D89A6A;
   --muted:      #6E6C61;
   --muted-light: rgba(246, 242, 233, .62);
@@ -33,6 +34,7 @@
 /* ---------- reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html.is-locked body { overflow: hidden; }
 body {
   margin: 0;
   font-family: var(--font);
@@ -47,6 +49,7 @@ img, svg, video { display: block; max-width: 100%; }
 img { height: auto; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+a, button { touch-action: manipulation; }
 h1, h2, h3, p, figure { margin: 0; }
 ul { margin: 0; padding: 0; list-style: none; }
 
@@ -56,7 +59,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   border-radius: 2px;
 }
 
-::selection { background: var(--clay); color: #fff; }
+::selection { background: var(--clay-ink); color: #fff; }
 
 .skip-link {
   position: fixed; top: 10px; left: 10px; z-index: 200;
@@ -74,14 +77,14 @@ ul { margin: 0; padding: 0; list-style: none; }
   padding-inline: var(--pad);
 }
 .section { padding-block: var(--section-y); }
-section[id] { scroll-margin-top: 88px; }
+section[id], .card[id] { scroll-margin-top: 88px; }
 
 .eyebrow {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: .2em;
   text-transform: uppercase;
-  color: var(--clay);
+  color: var(--clay-ink);
   margin-bottom: 18px;
 }
 .eyebrow--light { color: var(--clay-soft); }
@@ -126,14 +129,13 @@ section[id] { scroll-margin-top: 88px; }
 }
 .btn svg { width: 18px; height: 18px; flex: none; }
 .btn--primary {
-  background: var(--clay);
+  background: var(--clay-ink);
   color: #fff;
 }
-.btn--primary:hover { background: #A9602F; transform: translateY(-1px); }
+.btn--primary:hover { background: #8A4A20; transform: translateY(-1px); }
 .btn--ghost {
   border: 1px solid rgba(255, 255, 255, .38);
   color: #fff;
-  backdrop-filter: blur(6px);
 }
 .btn--ghost:hover { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .6); }
 
@@ -245,10 +247,10 @@ section[id] { scroll-margin-top: 88px; }
 .hero__media { position: absolute; inset: 0; z-index: -2; }
 .hero__media img {
   width: 100%; height: 100%; object-fit: cover; object-position: 52% 46%;
-  animation: heroIn 1.8s var(--ease) both;
+  animation: heroIn 1.1s var(--ease) both;
 }
 @keyframes heroIn {
-  from { transform: scale(1.06); opacity: .4; }
+  from { transform: scale(1.03); opacity: .55; }
   to   { transform: scale(1); opacity: 1; }
 }
 .hero__scrim {
@@ -347,7 +349,7 @@ section[id] { scroll-margin-top: 88px; }
 }
 .card__index {
   font-size: 11px; font-weight: 600; letter-spacing: .16em;
-  color: var(--clay); margin-bottom: 10px;
+  color: var(--clay-ink); margin-bottom: 10px;
 }
 .card__title {
   font-size: clamp(20px, 1.7vw, 24px);
@@ -374,7 +376,7 @@ section[id] { scroll-margin-top: 88px; }
   display: inline-flex; align-items: center; gap: 8px;
   margin-top: 18px;
   font-size: 13px; font-weight: 600;
-  color: var(--clay);
+  color: var(--clay-ink);
 }
 .card__more svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
 .card__link:hover .card__more svg { transform: translateX(4px); }
@@ -487,7 +489,8 @@ section[id] { scroll-margin-top: 88px; }
   content: "";
   position: absolute; inset: -8px 0;
 }
-.track__hint { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(246, 242, 233, .4); }
+.track__bar:focus-visible { outline: 2px solid var(--clay-soft); outline-offset: 6px; }
+.track__hint { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(246, 242, 233, .62); }
 
 .media__video { margin: 0; }
 .video {
@@ -537,7 +540,7 @@ section[id] { scroll-margin-top: 88px; }
   margin-top: 14px;
   font-size: 12px;
   letter-spacing: .04em;
-  color: rgba(246, 242, 233, .45);
+  color: rgba(246, 242, 233, .62);
 }
 
 /* ============================================================
@@ -574,14 +577,14 @@ section[id] { scroll-margin-top: 88px; }
 .footer__col a { transition: color .2s; }
 .footer__col a:hover { color: var(--clay-soft); }
 .footer__col a[href^="#top"] { display: inline-block; margin-top: 16px; color: var(--clay-soft); }
-.footer__small { margin-top: 14px; color: rgba(246, 242, 233, .45) !important; }
+.footer__small { margin-top: 14px; color: rgba(246, 242, 233, .62) !important; }
 .footer__bottom {
   display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
   padding-block: 22px;
   border-top: 1px solid rgba(246, 242, 233, .12);
   font-size: 11px;
   letter-spacing: .08em;
-  color: rgba(246, 242, 233, .42);
+  color: rgba(246, 242, 233, .62);
 }
 
 /* ============================================================
@@ -592,9 +595,9 @@ section[id] { scroll-margin-top: 88px; }
   display: grid;
   grid-template-columns: 80px 1fr 80px;
   align-items: center;
-  background: rgba(10, 16, 12, .95);
-  backdrop-filter: blur(8px);
+  background: rgba(10, 16, 12, .96);
   padding: 40px 20px;
+  overscroll-behavior: contain;
   opacity: 0;
   transition: opacity .3s var(--ease);
 }
@@ -630,12 +633,13 @@ section[id] { scroll-margin-top: 88px; }
 }
 
 /* ---------- появление при скролле ---------- */
-.reveal {
+/* скрываем только при работающем JS: без скрипта карточки остаются видимыми */
+.js .reveal {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity .8s var(--ease), transform .8s var(--ease);
 }
-.reveal.is-in { opacity: 1; transform: none; }
+.js .reveal.is-in { opacity: 1; transform: none; }
 
 /* ============================================================
    Адаптив
@@ -675,31 +679,50 @@ section[id] { scroll-margin-top: 88px; }
   .burger { display: block; }
 
   .hero { min-height: 92svh; padding-top: 96px; }
-  .hero__foot { font-size: 9px; letter-spacing: .12em; }
+  .hero__foot { font-size: 10px; letter-spacing: .12em; }
   .hero__scroll { display: none; }
 
   .cards { grid-template-columns: 1fr; gap: 36px; }
   .card__link { flex-direction: row; gap: 18px; align-items: flex-start; }
-  .card__media { width: 42%; flex: none; aspect-ratio: 1 / 1.1; }
+  .card__media { width: 38%; flex: none; aspect-ratio: 4 / 3; }
   .card__body { padding-top: 0; border-top: 0; margin-top: 0; flex: 1; }
 
-  .gallery__grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 150px; }
-  .shot--wide { grid-column: span 2; grid-row: span 1; }
+  .gallery__grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 140px; }
+  .shot--wide { grid-column: span 2; grid-row: span 2; }
 
   .footer__inner { grid-template-columns: 1fr; }
+}
+
+/* на узких планшетах карточка «картинка слева» оставляет пустоту справа */
+@media (max-width: 640px) {
+  .card__link { flex-direction: column; gap: 0; }
+  .card__media { width: 100%; aspect-ratio: 4 / 3; }
+  .card__body { padding-top: 16px; border-top: 1px solid var(--line); margin-top: 16px; }
 }
 
 @media (max-width: 560px) {
   .hero__title { font-size: clamp(38px, 12vw, 56px); }
   .hero__actions .btn { flex: 1; justify-content: center; min-height: 50px; padding-inline: 18px; font-size: 14px; }
-  .card__link { flex-direction: column; gap: 0; }
-  .card__media { width: 100%; aspect-ratio: 4 / 3; }
-  .card__body { padding-top: 16px; border-top: 1px solid var(--line); margin-top: 16px; }
 
-  .lightbox { grid-template-columns: 44px 1fr 44px; padding: 24px 8px; }
-  .lightbox__nav { font-size: 18px; }
+  .lightbox { grid-template-columns: 1fr; padding: 64px 10px 24px; }
+  .lightbox__nav {
+    position: absolute; top: 50%; z-index: 2;
+    width: 44px; height: 44px; margin-top: -22px;
+    border-radius: 50%;
+    background: rgba(10, 16, 12, .55);
+    font-size: 18px;
+  }
+  .lightbox__nav--prev { left: 4px; }
+  .lightbox__nav--next { right: 4px; }
   .track { padding: 14px; gap: 14px; }
   .track__play { width: 44px; height: 44px; }
+}
+
+/* совсем узкие экраны: две кнопки в строку ломают подписи */
+@media (max-width: 380px) {
+  .hero__actions { flex-direction: column; align-items: stretch; }
+  .hero__actions .btn { flex: none; width: 100%; }
+  .hero__title { font-size: 36px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -709,5 +732,5 @@ section[id] { scroll-margin-top: 88px; }
     animation-iteration-count: 1 !important;
     transition-duration: .001ms !important;
   }
-  .reveal { opacity: 1; transform: none; }
+  .reveal, .js .reveal { opacity: 1; transform: none; }
 }
