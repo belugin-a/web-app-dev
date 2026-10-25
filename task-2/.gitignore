@@ -5,3 +5,5 @@ __pycache__/
 uploads/
 sessions/
 *.log
+requests.db
+*.sqlite3

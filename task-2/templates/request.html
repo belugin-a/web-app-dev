@@ -11,9 +11,22 @@
         Поля, отмеченные <span class="req" aria-hidden="true">*</span>, обязательны.
       </p>
 
-      <form class="form" action="{{ url_for('request_page') }}" method="post" enctype="multipart/form-data">
+      {# novalidate: проверяем только на сервере, чтобы была видна работа серверной валидации #}
+      <form class="form" action="{{ url_for('request_page') }}" method="post"
+            enctype="multipart/form-data" novalidate>
 
-        <div class="field">
+        {% if errors %}
+          <div class="form__alert" role="alert">
+            <p class="form__alert-title">Проверьте поля формы</p>
+            <ul class="form__alert-list">
+              {% for field, message in errors.items() %}
+                <li><a href="#{{ 'plan' if field == 'plan' else field }}">{{ message }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <div class="field{% if errors.name %} field--error{% endif %}">
           <label class="field__label" for="name">Имя <span class="req" aria-hidden="true">*</span></label>
           <input
             class="input"
@@ -21,14 +34,18 @@
             id="name"
             name="name"
             required
-            minlength="2"
             maxlength="60"
             autocomplete="name"
-            aria-describedby="name-hint">
-          <p class="hint" id="name-hint">Как к вам обращаться. От 2 до 60 символов.</p>
+            value="{{ form.name }}"
+            {% if errors.name %}aria-invalid="true" aria-describedby="name-hint name-error"
+            {% else %}aria-describedby="name-hint"{% endif %}>
+          <p class="hint" id="name-hint">От 2 до 60 символов, только буквы и пробелы.</p>
+          {% if errors.name %}
+            <p class="field__error" id="name-error">{{ errors.name }}</p>
+          {% endif %}
         </div>
 
-        <div class="field">
+        <div class="field{% if errors.phone %} field--error{% endif %}">
           <label class="field__label" for="phone">Телефон <span class="req" aria-hidden="true">*</span></label>
           <input
             class="input"
@@ -36,15 +53,20 @@
             id="phone"
             name="phone"
             required
+            maxlength="30"
             inputmode="tel"
-            pattern="[\d\s()+-]{10,18}"
             placeholder="+7 (900) 000-00-00"
             autocomplete="tel"
-            aria-describedby="phone-hint">
-          <p class="hint" id="phone-hint">10–11 цифр. Например: +7 (900) 123-45-67.</p>
+            value="{{ form.phone }}"
+            {% if errors.phone %}aria-invalid="true" aria-describedby="phone-hint phone-error"
+            {% else %}aria-describedby="phone-hint"{% endif %}>
+          <p class="hint" id="phone-hint">Не меньше 9 цифр. Можно писать с «+», пробелами, скобками и тире.</p>
+          {% if errors.phone %}
+            <p class="field__error" id="phone-error">{{ errors.phone }}</p>
+          {% endif %}
         </div>
 
-        <div class="field">
+        <div class="field{% if errors.email %} field--error{% endif %}">
           <label class="field__label" for="email">E-mail <span class="req" aria-hidden="true">*</span></label>
           <input
             class="input"
@@ -55,11 +77,16 @@
             maxlength="120"
             autocomplete="email"
             placeholder="you@example.ru"
-            aria-describedby="email-hint">
-          <p class="hint" id="email-hint">Пришлём на этот адрес смету.</p>
+            value="{{ form.email }}"
+            {% if errors.email %}aria-invalid="true" aria-describedby="email-hint email-error"
+            {% else %}aria-describedby="email-hint"{% endif %}>
+          <p class="hint" id="email-hint">Например, name@example.ru — нужен домен как минимум второго уровня.</p>
+          {% if errors.email %}
+            <p class="field__error" id="email-error">{{ errors.email }}</p>
+          {% endif %}
         </div>
 
-        <div class="field">
+        <div class="field{% if errors.comment %} field--error{% endif %}">
           <label class="field__label" for="comment">Комментарий</label>
           <textarea
             class="input"
@@ -67,21 +94,31 @@
             name="comment"
             rows="5"
             maxlength="1000"
-            aria-describedby="comment-hint"></textarea>
-          <p class="hint" id="comment-hint">Необязательно. Площадь, этажность, пожелания. До 1000 символов.</p>
+            {% if errors.comment %}aria-invalid="true" aria-describedby="comment-hint comment-error"
+            {% else %}aria-describedby="comment-hint"{% endif %}>{{ form.comment }}</textarea>
+          <p class="hint" id="comment-hint">Необязательно. Площадь, этажность, пожелания — до 1000 символов, только текст.</p>
+          {% if errors.comment %}
+            <p class="field__error" id="comment-error">{{ errors.comment }}</p>
+          {% endif %}
         </div>
 
-        <div class="field">
-          <label class="field__label" for="plan">План дома (PDF) <span class="req" aria-hidden="true">*</span></label>
+        <div class="field{% if errors.plan %} field--error{% endif %}">
+          <label class="field__label" for="plan">План дома (PDF)</label>
           <input
             class="input input--file"
             type="file"
             id="plan"
             name="plan"
-            required
             accept=".pdf,application/pdf"
-            aria-describedby="plan-hint">
-          <p class="hint" id="plan-hint">Один файл в формате PDF, не больше 1 МБ.</p>
+            {% if errors.plan %}aria-invalid="true" aria-describedby="plan-hint plan-error"
+            {% else %}aria-describedby="plan-hint"{% endif %}>
+          <p class="hint" id="plan-hint">
+            Необязательно. Один файл PDF, не больше 1 МБ.
+            Если форма вернулась с ошибкой, файл нужно выбрать заново.
+          </p>
+          {% if errors.plan %}
+            <p class="field__error" id="plan-error">{{ errors.plan }}</p>
+          {% endif %}
         </div>
 
         <div class="form__actions">

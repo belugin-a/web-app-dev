@@ -486,6 +486,73 @@ textarea.input {
   margin-top: var(--space-6);
 }
 
+/* ---------- 12.1. Сводка ошибок формы ---------- */
+.form__alert {
+  margin-bottom: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.form__alert-title {
+  margin-bottom: var(--space-2);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--danger);
+}
+
+.form__alert-list {
+  margin: 0;
+  padding-left: 1.2em;
+  font-size: 14px;
+}
+
+.form__alert-list li + li { margin-top: var(--space-1); }
+.form__alert-list a { color: var(--danger); }
+
+.input[aria-invalid="true"] {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* ---------- 12.2. Таблица данных заявки ---------- */
+.data {
+  margin: var(--space-5) 0 var(--space-6);
+  border-top: 1px solid var(--line);
+}
+
+.data__row {
+  display: grid;
+  grid-template-columns: minmax(130px, 180px) 1fr;
+  gap: var(--space-2) var(--space-5);
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.data dt {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.data dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- 12.3. Блок с файлом ---------- */
+.file-link {
+  margin-top: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  background: var(--cream);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+}
+
+.file-link p + p { margin-top: var(--space-3); }
+
 /* ---------- 13. Подвал ---------- */
 .site-footer {
   padding-block: var(--space-7);
@@ -532,6 +599,11 @@ textarea.input {
   .btn--large { width: 100%; }
   .form__actions .btn { width: 100%; }
   .panel__actions .btn { width: 100%; }
+
+  .data__row {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
 }
 
 @media (min-width: 721px) {
