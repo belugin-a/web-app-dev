@@ -123,6 +123,10 @@ img, svg { max-width: 100%; height: auto; }
 .section { padding-block: clamp(40px, 7vw, 80px); }
 .section--paper { background: var(--paper); border-block: 1px solid var(--line); }
 
+/* липкая шапка не должна накрывать блок, к которому пришли по якорю */
+section[id],
+footer[id] { scroll-margin-top: 88px; }
+
 .section__title { font-size: clamp(24px, 3vw, 34px); }
 .section__lede {
   max-width: 62ch;
@@ -654,6 +658,42 @@ textarea.input {
     grid-template-columns: 1fr;
     gap: var(--space-1);
   }
+
+  /* на телефоне шапка не должна есть четверть экрана: blur дорог, якоря ближе */
+  .site-header {
+    background: var(--cream);
+    backdrop-filter: none;
+  }
+  section[id],
+  footer[id] { scroll-margin-top: 80px; }
+
+  /* телефонные/почтовые ссылки — полноценные тач-таргеты, а не строки в 20 px */
+  .site-footer__address a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* до 640 px три ссылки + CTA не влезают в строку: оставляем логотип и кнопку */
+@media (max-width: 640px) {
+  .site-header__inner { flex-wrap: nowrap; }
+  .site-header__brand { flex-wrap: nowrap; min-width: 0; }
+  .nav__list > li:not(:last-child) { display: none; }
+  .nav__list { flex-wrap: nowrap; }
+  .site-header__inner .btn {
+    padding-inline: var(--space-4);
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .brand { font-size: 16px; }
+  .brand__mark { width: 20px; height: 20px; }
+}
+
+/* 320 px — самый узкий поддерживаемый: чуть поджимаем отступы, чтобы не переносилось */
+@media (max-width: 360px) {
+  .site-header__inner { gap: var(--space-2); }
+  .site-header__inner .btn { padding-inline: var(--space-3); font-size: 13px; }
 }
 
 @media (min-width: 721px) {
