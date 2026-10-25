@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Викторина по основам веб-разработки</title>
+  <meta name="description" content="Пять вопросов по HTML, CSS и JavaScript. Один вопрос на экране, три варианта ответа, проверка сразу после выбора.">
+  <meta name="theme-color" content="#1F3D2B">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+</head>
+
+<body>
+
+  <noscript>
+    <p class="noscript">Для викторины нужен JavaScript: включите его в браузере и обновите страницу.</p>
+  </noscript>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html">
+        <img class="brand__logo" src="assets/favicon.svg" alt="" width="26" height="26">
+        Web-викторина
+      </a>
+    </div>
+  </header>
+
+  <main id="main" class="stage">
+    <div class="container stage__inner">
+
+      <div class="quiz-top">
+        <p class="quiz-top__step" id="quiz-step">Вопрос 1 из 5</p>
+        <p class="quiz-top__score">Верных <strong id="quiz-score">0</strong></p>
+      </div>
+
+      <article class="slide" id="quiz-slide" aria-live="polite" aria-atomic="true">
+        <h1 class="slide__question" id="quiz-question"></h1>
+        <div class="options" id="quiz-options"></div>
+        <p class="slide__feedback" id="quiz-feedback" aria-live="polite" hidden></p>
+      </article>
+
+      <div class="stage__controls" id="quiz-controls">
+        <button class="btn btn--primary btn--large btn--next" type="button" id="quiz-next" disabled>
+          <span id="quiz-next-label">Далее</span>
+          <span class="btn__arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+
+      <section class="result" id="quiz-result" aria-labelledby="result-title" hidden>
+        <h2 class="result__title" id="result-title">Викторина завершена</h2>
+        <p class="result__score"><strong id="result-score">0</strong><span> из 5</span></p>
+        <p class="result__verdict" id="result-verdict"></p>
+        <button class="btn btn--primary btn--large" type="button" id="result-restart">Пройти заново</button>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Плашка варианта ответа: текст подставляет JavaScript из объекта QUIZ -->
+  <template id="option-template">
+    <button class="option" type="button">
+      <span class="option__key" aria-hidden="true"></span>
+      <span class="option__text"></span>
+      <span class="option__mark" aria-hidden="true"></span>
+    </button>
+  </template>
+
+</body>
+
+</html>

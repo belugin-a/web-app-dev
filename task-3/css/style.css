@@ -1,0 +1,483 @@
+/* ============================================================
+   Викторина по основам веб-разработки — стили (ПР №3)
+   База: task-2/static/css/style.css — те же токены и кнопки.
+   Порядок: токены → база → шапка → сцена → вопрос → плашки →
+            отклик → кнопки → итог → адаптив → настройки ОС
+   ============================================================ */
+
+/* ---------- 1. Токены ---------- */
+:root {
+  /* цвет — из работы №2 */
+  --ink:        #14211A;
+  --ink-soft:   #4A564F;
+  --pine:       #1F3D2B;
+  --pine-deep:  #162C1F;
+  --clay:       #C0723B;
+  --clay-ink:   #A0562A;
+  --clay-soft:  #F1E2D5;
+  --cream:      #F6F2E9;
+  --paper:      #FFFDF8;
+  --line:       #DAD3C2;
+  --danger:     #A12F2F;
+  --danger-soft:#F7E4E2;
+
+  /* новые для викторины: «верно» */
+  --correct:      #2F6B45;
+  --correct-soft: #E7EFE4;
+
+  /* размеры и отступы (шаг 8 px, кроме 4 и 12) — из работы №2 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --radius-sm: 6px;
+  --radius:    10px;
+
+  --stage: 1200px;
+
+  --shadow-sm: 0 1px 2px rgba(20, 33, 26, .06);
+  --shadow:    0 1px 2px rgba(20, 33, 26, .05),
+               0 12px 28px -18px rgba(20, 33, 26, .35);
+
+  --ease: cubic-bezier(.2, .6, .2, 1);
+
+  /* антиква для вопроса и итога, sans для интерфейса */
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino,
+                  "Book Antiqua", Georgia, "Times New Roman", serif;
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Segoe UI Mono", Consolas, monospace;
+}
+
+/* ---------- 2. База ---------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  background:
+    radial-gradient(1100px 420px at 88% -12%, var(--clay-soft) 0%, transparent 62%),
+    radial-gradient(760px 320px at -10% 108%, #E9E6D6 0%, transparent 60%),
+    var(--cream);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2 {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  color: var(--pine);
+}
+
+p { margin: 0; }
+
+:focus-visible {
+  outline: 3px solid var(--clay);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: var(--clay-soft);
+  color: var(--pine);
+}
+
+[hidden] { display: none !important; }
+
+.noscript {
+  margin: 0;
+  padding: var(--space-4);
+  font-size: 15px;
+  text-align: center;
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* ---------- 3. Шапка и сцена ---------- */
+.container {
+  width: 100%;
+  max-width: var(--stage);
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+
+.site-header {
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  padding-block: var(--space-2);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--pine);
+  text-decoration: none;
+}
+
+.brand__logo {
+  display: block;
+  width: 26px;
+  height: 26px;
+}
+
+.stage {
+  display: flex;
+  flex: 1 0 auto;
+  align-items: center;
+}
+
+.stage__inner {
+  padding-block: clamp(24px, 5vh, 56px);
+}
+
+/* ---------- 4. Верхняя строка ---------- */
+.quiz-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.quiz-top__step {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--clay-ink);
+}
+
+.quiz-top__score {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.quiz-top__score strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pine);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 5. Вопрос ---------- */
+.slide { padding-top: clamp(24px, 4vw, 40px); }
+
+.slide--in { animation: slide-in .3s var(--ease) both; }
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.slide__question {
+  max-width: 30ch;
+  margin-bottom: clamp(24px, 4vw, 36px);
+  font-family: var(--font-display);
+  font-size: clamp(27px, 3.5vw, 44px);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+  color: var(--pine);
+  text-wrap: balance;
+}
+
+/* ---------- 6. Плашки вариантов ---------- */
+.options {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3) clamp(14px, 2vw, 22px);
+  width: 100%;
+  min-height: 76px;
+  padding: clamp(14px, 2vw, 18px) clamp(16px, 2.5vw, 26px);
+  font: inherit;
+  font-size: clamp(16px, 1.5vw, 18px);
+  line-height: 1.4;
+  text-align: left;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform .18s var(--ease),
+              border-color .18s var(--ease),
+              background-color .18s var(--ease),
+              box-shadow .18s var(--ease);
+}
+
+.option:hover:not(:disabled) {
+  transform: translateX(6px);
+  border-color: var(--clay);
+  box-shadow: var(--shadow);
+}
+
+.option:active:not(:disabled) { transform: translateX(6px) translateY(1px); }
+
+.option:disabled { cursor: default; }
+
+.option__key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--clay-ink);
+  background: var(--clay-soft);
+  border-radius: var(--radius-sm);
+  transition: background-color .18s var(--ease), color .18s var(--ease);
+}
+
+.option__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.option code {
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: .92em;
+  color: var(--pine);
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: var(--space-1);
+}
+
+/* ответ выбран: верный / неверный / остальные приглушены */
+.option.is-correct {
+  border-color: var(--correct);
+  background: var(--correct-soft);
+  box-shadow: inset 0 0 0 1px var(--correct);
+}
+.option.is-correct .option__key {
+  color: var(--paper);
+  background: var(--correct);
+}
+.option.is-correct .option__mark { color: var(--correct); }
+.option.is-correct .option__mark::before { content: "✓"; }
+
+.option.is-wrong {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+  box-shadow: inset 0 0 0 1px var(--danger);
+}
+.option.is-wrong .option__key {
+  color: var(--paper);
+  background: var(--danger);
+}
+.option.is-wrong .option__mark { color: var(--danger); }
+.option.is-wrong .option__mark::before { content: "✕"; }
+
+.option.is-muted { opacity: .5; }
+
+/* ---------- 7. Отклик и управление ---------- */
+.slide__feedback {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: clamp(18px, 3vw, 26px);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.slide__feedback::before {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 50%;
+}
+
+.slide__feedback.is-correct { color: var(--correct); }
+.slide__feedback.is-correct::before {
+  content: "✓";
+  background: var(--correct-soft);
+}
+
+.slide__feedback.is-wrong { color: var(--danger); }
+.slide__feedback.is-wrong::before {
+  content: "✕";
+  background: var(--danger-soft);
+}
+
+.stage__controls {
+  margin-top: clamp(24px, 4vw, 36px);
+  padding-top: clamp(18px, 3vw, 24px);
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- 8. Кнопки (из работы №2) ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color .2s var(--ease),
+              transform .2s var(--ease);
+}
+
+.btn--primary {
+  color: var(--paper);
+  background: var(--pine);
+}
+.btn--primary:hover { background: var(--pine-deep); }
+.btn--primary:active { transform: translateY(1px); }
+
+.btn--large {
+  min-height: 52px;
+  padding-inline: var(--space-6);
+  font-size: 16px;
+}
+
+.btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn--next {
+  min-width: 210px;
+  justify-content: space-between;
+}
+
+.btn__arrow {
+  font-size: 18px;
+  line-height: 1;
+  transition: transform .2s var(--ease);
+}
+.btn--next:hover:not(:disabled) .btn__arrow { transform: translateX(3px); }
+
+/* ---------- 9. Итог ---------- */
+.result { padding-top: clamp(24px, 4vw, 40px); }
+
+.result__title {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 600;
+}
+
+.result__score {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: clamp(20px, 3vw, 28px) 0 var(--space-3);
+  font-family: var(--font-display);
+  line-height: 1;
+  color: var(--pine);
+  font-variant-numeric: tabular-nums;
+}
+.result__score strong {
+  font-size: clamp(64px, 11vw, 104px);
+  font-weight: 600;
+  letter-spacing: -.03em;
+}
+.result__score span {
+  font-size: clamp(20px, 2.4vw, 26px);
+  color: var(--ink-soft);
+}
+
+.result__verdict {
+  max-width: 46ch;
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+
+.result .btn { margin-top: var(--space-6); }
+
+/* ---------- 10. Адаптив ---------- */
+@media (max-width: 720px) {
+  .brand { font-size: 16px; }
+  .brand__logo { width: 22px; height: 22px; }
+
+  .option { min-height: 68px; border-radius: var(--radius-sm); }
+  .option:hover:not(:disabled) { transform: none; }
+  .option__key { width: 34px; height: 34px; font-size: 16px; }
+
+  .btn--large { width: 100%; }
+}
+
+/* невысокие экраны (ноутбук 1280×720): поджимаем вертикальные отступы,
+   чтобы вопрос, плашки, отклик и «Далее» оставались на одном экране */
+@media (min-width: 721px) and (max-height: 780px) {
+  .stage__inner { padding-block: var(--space-5); }
+  .slide { padding-top: var(--space-4); }
+  .slide__question { margin-bottom: var(--space-5); }
+  .stage__controls { margin-top: var(--space-5); padding-top: var(--space-4); }
+}
+
+/* маленькие телефоны (360×640): тот же приём, иначе отклик выталкивает «Далее» */
+@media (max-width: 720px) and (max-height: 700px) {
+  .stage__inner { padding-block: var(--space-4); }
+  .slide { padding-top: var(--space-3); }
+  .slide__question { margin-bottom: var(--space-5); }
+  .slide__feedback { margin-top: var(--space-3); }
+  .stage__controls { margin-top: var(--space-4); padding-top: var(--space-3); }
+}
+
+@media (max-width: 380px) {
+  .option { grid-template-columns: auto minmax(0, 1fr); }
+  .option__mark { display: none; }
+}
+
+/* ---------- 11. Настройки ОС ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
