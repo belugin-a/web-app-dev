@@ -5,32 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Свой Дом — строительство домов под ключ{% endblock %}</title>
   <meta name="description" content="Строим частные дома под ключ: фундамент, коробка, кровля, отделка. Расчёт стоимости по вашему плану.">
+  <meta name="theme-color" content="#1F3D2B">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-  <header>
-    <p><a href="{{ url_for('index') }}">Свой Дом</a></p>
-    <nav aria-label="Основная навигация">
-      <ul>
-        <li><a href="{{ url_for('index') }}#services">Услуги</a></li>
-        <li><a href="{{ url_for('index') }}#contacts">Контакты</a></li>
-        <li><a href="{{ url_for('request_page') }}">Оставить заявку</a></li>
-      </ul>
-    </nav>
+  <a class="skip-link" href="#main">Перейти к содержанию</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand__mark" aria-hidden="true"></span>
+        Свой Дом
+      </a>
+
+      <nav class="nav" aria-label="Основная навигация">
+        <ul class="nav__list">
+          <li><a class="nav__link" href="{{ url_for('index') }}#services">Услуги</a></li>
+          <li><a class="nav__link" href="{{ url_for('index') }}#steps">Как начать</a></li>
+          <li><a class="nav__link" href="{{ url_for('index') }}#contacts">Контакты</a></li>
+          <li><a class="btn btn--primary" href="{{ url_for('request_page') }}">Оставить заявку</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main>
+  <main id="main">
     {% block content %}{% endblock %}
   </main>
 
-  <footer id="contacts">
-    <h2>Контакты</h2>
-    <address>
-      Самара, ул. Примерная, 1<br>
-      Телефон: <a href="tel:+79000000000">+7 (900) 000-00-00</a><br>
-      E-mail: <a href="mailto:info@example.ru">info@example.ru</a>
-    </address>
-    <p><small>Учебный проект. Контакты и цены демонстрационные.</small></p>
+  <footer class="site-footer" id="contacts">
+    <div class="container site-footer__inner">
+      <div>
+        <h2 class="site-footer__title">Контакты</h2>
+        <address class="site-footer__address">
+          Самара, ул. Примерная, 1<br>
+          Телефон: <a href="tel:+79000000000">+7 (900) 000-00-00</a><br>
+          E-mail: <a href="mailto:info@example.ru">info@example.ru</a>
+        </address>
+      </div>
+      <p class="site-footer__note">Учебный проект. Контакты и цены демонстрационные.</p>
+    </div>
   </footer>
 
 </body>

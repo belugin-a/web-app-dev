@@ -3,46 +3,74 @@
 {% block title %}Свой Дом — строительство домов под ключ{% endblock %}
 
 {% block content %}
-  <section>
-    <h1>Строим дома под ключ в Самаре и области</h1>
-    <p>
-      Берём участок с нуля: фундамент, коробка, кровля, отделка.
-      Считаем стоимость по вашему плану и фиксируем её в договоре.
-    </p>
-    <p>
-      <a href="{{ url_for('request_page') }}">Рассчитать стоимость</a>
-    </p>
+  <section class="hero">
+    <div class="container hero__inner">
+      <p class="eyebrow">Частные дома под ключ</p>
+      <h1 class="hero__title">Строим дома под ключ в Самаре и области</h1>
+      <p class="hero__lede">
+        Берём участок с нуля: фундамент, коробка, кровля, отделка.
+        Считаем стоимость по вашему плану и фиксируем её в договоре.
+      </p>
+      <p class="hero__actions">
+        <a class="btn btn--primary btn--large" href="{{ url_for('request_page') }}">Рассчитать стоимость</a>
+        <a class="btn btn--ghost" href="#services">Смотреть услуги</a>
+      </p>
+      <ul class="hero__facts">
+        <li><strong>12 лет</strong> строим дома</li>
+        <li><strong>40+</strong> сданных объектов</li>
+        <li><strong>1 день</strong> на расчёт сметы</li>
+      </ul>
+    </div>
   </section>
 
-  <section id="services">
-    <h2>Услуги</h2>
-    <ul>
-      <li>
-        <h3>Фундамент</h3>
-        <p>Ленточный, плитный или свайный — под ваш грунт и проект.</p>
-      </li>
-      <li>
-        <h3>Коробка дома</h3>
-        <p>Газобетон, кирпич или каркас. Возводим с перекрытиями и кровлей.</p>
-      </li>
-      <li>
-        <h3>Кровля</h3>
-        <p>Стропильная система, утепление, металлочерепица или гибкая черепица.</p>
-      </li>
-      <li>
-        <h3>Отделка</h3>
-        <p>Черновая и чистовая: от стяжки до покраски стен.</p>
-      </li>
-    </ul>
+  <section class="section" id="services">
+    <div class="container">
+      <h2 class="section__title">Услуги</h2>
+      <p class="section__lede">Можно взять весь цикл целиком или отдельный этап — смета считается по вашему проекту.</p>
+
+      <ul class="cards">
+        <li class="card">
+          <h3 class="card__title">Фундамент</h3>
+          <p class="card__text">Ленточный, плитный или свайный — под ваш грунт и проект.</p>
+        </li>
+        <li class="card">
+          <h3 class="card__title">Коробка дома</h3>
+          <p class="card__text">Газобетон, кирпич или каркас. Возводим с перекрытиями и кровлей.</p>
+        </li>
+        <li class="card">
+          <h3 class="card__title">Кровля</h3>
+          <p class="card__text">Стропильная система, утепление, металлочерепица или гибкая черепица.</p>
+        </li>
+        <li class="card">
+          <h3 class="card__title">Отделка</h3>
+          <p class="card__text">Черновая и чистовая: от стяжки до покраски стен.</p>
+        </li>
+      </ul>
+    </div>
   </section>
 
-  <section>
-    <h2>Как начать</h2>
-    <ol>
-      <li>Пришлите план дома PDF — до 1 МБ.</li>
-      <li>Оставьте имя, телефон и почту для связи.</li>
-      <li>Мы посчитаем смету и перезвоним.</li>
-    </ol>
-    <p><a href="{{ url_for('request_page') }}">Оставить заявку</a></p>
+  <section class="section section--paper" id="steps">
+    <div class="container">
+      <h2 class="section__title">Как начать</h2>
+
+      <ol class="steps">
+        <li class="step">
+          <h3 class="step__title">Пришлите план</h3>
+          <p class="step__text">PDF-файл с планировкой, не больше 1 МБ.</p>
+        </li>
+        <li class="step">
+          <h3 class="step__title">Оставьте контакты</h3>
+          <p class="step__text">Имя, телефон и почта — чтобы прислать смету.</p>
+        </li>
+        <li class="step">
+          <h3 class="step__title">Получите расчёт</h3>
+          <p class="step__text">Перезвоним, уточним детали и назовём стоимость.</p>
+        </li>
+      </ol>
+
+      <p class="section__actions">
+        <a class="btn btn--primary btn--large" href="{{ url_for('request_page') }}">Оставить заявку</a>
+      </p>
+    </div>
   </section>
 {% endblock %}
