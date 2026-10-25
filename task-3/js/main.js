@@ -200,15 +200,12 @@ function finish() {
 }
 
 function restart() {
-  state.index = 0;
   state.score = 0;
-  state.answered = false;
-
   ui.score.textContent = '0';
   ui.result.hidden = true;
   ui.controls.hidden = false;
 
-  render(0);
+  render(0); // выставляет state.index и state.answered
   ui.options.firstElementChild?.focus({ preventScroll: true });
 }
 
@@ -223,11 +220,11 @@ function getVerdict(score, total) {
 
 /* ---------- 7. Старт ---------- */
 
-if (
-  ui.slide && ui.step && ui.score && ui.question && ui.options && ui.feedback &&
-  ui.controls && ui.next && ui.nextLabel && ui.result && ui.resultScore &&
-  ui.resultVerdict && ui.resultRestart && ui.optionTemplate
-) {
+const missing = Object.entries(ui).filter(([, element]) => !element).map(([name]) => name);
+
+if (missing.length) {
+  console.error('Викторина: не найдены элементы страницы —', missing.join(', '));
+} else {
   render(0);
 
   ui.options.addEventListener('click', onAnswerClick);
