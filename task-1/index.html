@@ -303,7 +303,8 @@
     <button class="lightbox__close" type="button" aria-label="Закрыть">×</button>
     <button class="lightbox__nav lightbox__nav--prev" type="button" aria-label="Предыдущая">←</button>
     <figure class="lightbox__figure">
-      <img id="lightboxImg" alt="">
+      <!-- src подставляется при открытии; пустой src браузер трактует как URL страницы -->
+      <img id="lightboxImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">
       <figcaption id="lightboxCaption"></figcaption>
     </figure>
     <button class="lightbox__nav lightbox__nav--next" type="button" aria-label="Следующая">→</button>
