@@ -108,6 +108,14 @@ p { margin: 0; }
   box-shadow: var(--shadow);
 }
 
+.calculator__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-4);
+}
+
 .calculator__title {
   font-family: var(--font-display);
   font-size: clamp(28px, 3.5vw, 40px);
@@ -128,7 +136,7 @@ p { margin: 0; }
 
 .calculator__row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: end;
   gap: var(--space-4);
 }
@@ -177,35 +185,24 @@ p { margin: 0; }
 .field__input { -moz-appearance: textfield; }
 
 /* ---------- 5. Операции ---------- */
+/* Всегда отдельная строка под полями, даже на широком экране */
 .operations {
   display: grid;
-  grid-template-columns: repeat(4, minmax(52px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-2);
-  margin: 0;
-  padding: var(--space-2);
-  background: var(--cream);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-}
-
-.operations__legend {
-  padding: 0 var(--space-1);
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
+  margin-top: var(--space-5);
 }
 
 .operation {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  min-height: 64px;
-  padding: var(--space-1) var(--space-2);
+  min-height: 68px;
+  padding: var(--space-2);
+  font: inherit;
+  text-align: center;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
@@ -214,79 +211,55 @@ p { margin: 0; }
               color .18s var(--ease), transform .18s var(--ease);
 }
 
-.operation:hover { border-color: var(--clay); }
+.operation:hover {
+  border-color: var(--clay);
+  background: var(--clay-soft);
+}
 
-.operation__input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
+.operation:active { transform: translateY(1px); }
+
+.operation:focus-visible {
+  outline: 3px solid var(--clay);
+  outline-offset: 2px;
 }
 
 .operation__sign {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   line-height: 1;
   color: var(--pine);
 }
 
 .operation__name {
-  font-size: 11px;
+  font-size: 11.5px;
   letter-spacing: .04em;
   color: var(--ink-soft);
 }
 
-.operation__input:checked + .operation__sign { color: var(--paper); }
-
-.operation:has(.operation__input:checked) {
-  background: var(--pine);
-  border-color: var(--pine);
-}
-.operation:has(.operation__input:checked) .operation__name { color: var(--clay-soft); }
-
-.operation:has(.operation__input:focus-visible) {
-  outline: 3px solid var(--clay);
-  outline-offset: 2px;
-}
-
-/* ---------- 6. Кнопка «=» ---------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 0 var(--space-5);
+/* ---------- 6. Сброс ---------- */
+.reset {
+  min-height: 40px;
+  padding: 0 var(--space-4);
   font: inherit;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
-  line-height: 1.2;
-  border: 1px solid transparent;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color .2s var(--ease), transform .2s var(--ease);
+  transition: color .18s var(--ease), border-color .18s var(--ease),
+              background-color .18s var(--ease);
 }
 
-.btn--primary {
-  color: var(--paper);
-  background: var(--pine);
+.reset:hover {
+  color: var(--pine);
+  border-color: var(--clay);
+  background: var(--clay-soft);
 }
-.btn--primary:hover { background: var(--pine-deep); }
-.btn--primary:active { transform: translateY(1px); }
 
-.calculator__submit {
-  width: 100%;
-  min-height: 56px;
-  margin-top: var(--space-4);
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 700;
-}
+.reset:active { transform: translateY(1px); }
 
 /* ---------- 7. Результат ---------- */
 .result-block {
@@ -327,20 +300,19 @@ p { margin: 0; }
 }
 
 /* ---------- 8. Адаптив ---------- */
+/* Поля всегда в одну строку; на узком экране просто уменьшаем отступы */
 @media (max-width: 760px) {
-  .calculator__row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-5);
-  }
-
-  .operations {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+  .calculator { padding: var(--space-5) var(--space-4); }
+  .calculator__row { gap: var(--space-3); }
+  .field__input { padding: 0 var(--space-3); font-size: 19px; }
+  .operations { gap: var(--space-1); }
+  .operation { min-height: 60px; padding: var(--space-1); }
 }
 
-@media (max-width: 420px) {
-  .operations { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .operation { min-height: 56px; }
+/* на маленьких экранах подписи операций скрываем — остаются знаки */
+@media (max-width: 520px) {
+  .operation__sign { font-size: 24px; }
+  .operation__name { display: none; }
 }
 
 /* ---------- 9. Настройки ОС ---------- */
