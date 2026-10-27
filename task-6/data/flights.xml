@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schedule updated="2026-10-28T12:00:00+03:00">
+    <flight id="SU-1234" number="SU 1234">
+        <terminal>A</terminal>
+        <checkIn>12–14</checkIn>
+    </flight>
+    <flight id="S7-042" number="S7 042">
+        <terminal>B</terminal>
+        <checkIn>21–23</checkIn>
+    </flight>
+    <flight id="U6-315" number="U6 315">
+        <terminal>C</terminal>
+        <checkIn>31–32</checkIn>
+    </flight>
+    <flight id="DP-205" number="DP 205">
+        <terminal>A</terminal>
+        <checkIn>41–42</checkIn>
+    </flight>
+    <flight id="SU-208" number="SU 208">
+        <terminal>B</terminal>
+        <checkIn>15–17</checkIn>
+    </flight>
+    <flight id="N4-511" number="N4 511">
+        <terminal>C</terminal>
+        <checkIn>33–34</checkIn>
+    </flight>
+    <flight id="5N-731" number="5N 731">
+        <terminal>A</terminal>
+        <checkIn>43–44</checkIn>
+    </flight>
+    <flight id="U6-421" number="U6 421">
+        <terminal>B</terminal>
+        <checkIn>35–36</checkIn>
+    </flight>
+    <flight id="SU-1506" number="SU 1506">
+        <terminal>C</terminal>
+        <checkIn>18–20</checkIn>
+    </flight>
+    <flight id="WZ-305" number="WZ 305">
+        <terminal>A</terminal>
+        <checkIn>45–46</checkIn>
+    </flight>
+</schedule>

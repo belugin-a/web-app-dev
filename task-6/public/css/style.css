@@ -43,6 +43,7 @@ body {
 
 .panel-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
@@ -54,6 +55,13 @@ body {
     font-size: 20px;
 }
 
+.load-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
 .load-control {
     display: flex;
     flex-direction: column;
@@ -62,6 +70,7 @@ body {
 }
 
 .load-status {
+    max-width: 420px;
     min-height: 1.2em;
     margin: 0;
     color: #52606d;
@@ -71,6 +80,13 @@ body {
 
 .load-status--error {
     color: #a61b1b;
+}
+
+.panel-caption {
+    margin: 0 0 6px;
+    color: #52606d;
+    font-size: 13px;
+    text-align: right;
 }
 
 .button {

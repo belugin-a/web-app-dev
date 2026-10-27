@@ -12,12 +12,20 @@
             <h1>Табло авиарейсов</h1>
         </header>
 
+        <p class="panel-caption">Из XML берутся только стойки регистрации и терминал; остальные колонки — из JSON.</p>
+
         <section class="panel">
             <div class="panel-header">
                 <h2>Расписание рейсов</h2>
-                <div class="load-control">
-                    <button type="button" id="load-data" class="button">Загрузить данные из JSON-файла</button>
-                    <p id="load-status" class="load-status" role="status"></p>
+                <div class="load-controls">
+                    <div class="load-control">
+                        <button type="button" id="load-data" class="button">Загрузить данные из JSON-файла</button>
+                        <p id="load-status" class="load-status" role="status"></p>
+                    </div>
+                    <div class="load-control">
+                        <button type="button" id="load-xml" class="button">Загрузить данные из XML-файла</button>
+                        <p id="xml-status" class="load-status" role="status"></p>
+                    </div>
                 </div>
             </div>
 

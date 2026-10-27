@@ -13,6 +13,7 @@ export const state = {
   flights: [],
   totalCount: 0,
   loaded: false,
+  xmlDetails: new Map(),
 };
 
 const highlightedIds = new Set();
@@ -32,6 +33,14 @@ export function setFlights(flights) {
   state.totalCount = flights.length;
   state.loaded = true;
   renderFlights();
+}
+
+export function setXmlDetails(details) {
+  state.xmlDetails = details;
+
+  if (state.loaded) {
+    renderFlights();
+  }
 }
 
 export function replaceFlights(flights) {
@@ -78,18 +87,24 @@ export function renderFlights() {
     return;
   }
 
+  const showXmlDetails = state.xmlDetails.size > 0;
+
   const rows = state.flights
-    .map(
-      (flight) => `
+    .map((flight) => {
+      const details = state.xmlDetails.get(flight.id);
+
+      return `
         <tr data-flight-id="${escapeHtml(flight.id)}" class="${highlightedIds.has(flight.id) ? 'row--changed' : ''}">
           <td class="flight-number">${escapeHtml(flight.number)}</td>
           <td>${escapeHtml(flight.airline)}</td>
           <td>${escapeHtml(flight.city)}</td>
           <td class="flight-time">${escapeHtml(flight.time)}</td>
           <td>${escapeHtml(flight.gate)}</td>
+          ${showXmlDetails ? `<td>${escapeHtml(details?.terminal ?? '—')}</td>` : ''}
+          ${showXmlDetails ? `<td>${escapeHtml(details?.checkIn ?? '—')}</td>` : ''}
           <td><span class="status status--${statusModifier(flight.status)}">${escapeHtml(flight.status)}</span></td>
-        </tr>`,
-    )
+        </tr>`;
+    })
     .join('');
 
   container.innerHTML = `
@@ -102,6 +117,8 @@ export function renderFlights() {
             <th scope="col">Город</th>
             <th scope="col">Время</th>
             <th scope="col">Выход</th>
+            ${showXmlDetails ? '<th scope="col">Терминал</th>' : ''}
+            ${showXmlDetails ? '<th scope="col">Регистрация</th>' : ''}
             <th scope="col">Статус</th>
           </tr>
         </thead>
