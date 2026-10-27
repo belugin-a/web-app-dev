@@ -1,9 +1,12 @@
 import { JSON_SOURCE, loadFlightsFromJson } from './json-view.js';
+import { initLiveUpdates, requestSnapshot } from './live.js';
 import { escapeHtml } from './store.js';
 
 const loadButton = document.querySelector('#load-data');
 const loadStatus = document.querySelector('#load-status');
 const flightsContainer = document.querySelector('#flights');
+
+initLiveUpdates();
 
 loadButton.addEventListener('click', async () => {
   const buttonText = loadButton.textContent;
@@ -16,6 +19,7 @@ loadButton.addEventListener('click', async () => {
   try {
     await loadFlightsFromJson();
     loadStatus.textContent = `Данные из файла ${JSON_SOURCE} успешно загружены`;
+    requestSnapshot();
   } catch (error) {
     loadStatus.textContent = `Не удалось загрузить ${JSON_SOURCE}: ${error.message}`;
     loadStatus.classList.add('load-status--error');

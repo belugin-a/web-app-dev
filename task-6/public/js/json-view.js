@@ -1,6 +1,6 @@
-import { renderFlights, setFlights } from './store.js';
+import { setFlights } from './store.js';
 
-const JSON_SOURCE = 'data/flights.json';
+export const JSON_SOURCE = 'data/flights.json';
 
 export async function loadFlightsFromJson() {
   const response = await fetch(JSON_SOURCE, { cache: 'no-store' });
@@ -16,9 +16,6 @@ export async function loadFlightsFromJson() {
   }
 
   setFlights(data.flights);
-  renderFlights();
 
   return data.flights.length;
 }
-
-export { JSON_SOURCE };

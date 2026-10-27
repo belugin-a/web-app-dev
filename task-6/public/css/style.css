@@ -37,6 +37,10 @@ body {
     background: #ffffff;
 }
 
+.panel + .panel {
+    margin-top: 16px;
+}
+
 .panel-header {
     display: flex;
     align-items: center;
@@ -151,4 +155,74 @@ body {
     border: 1px solid #f3b6b6;
     background: #fdf0f0;
     color: #a61b1b;
+}
+
+.live-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.connection {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #52606d;
+    font-size: 13px;
+}
+
+.connection__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #9aa5b1;
+}
+
+.connection--open .connection__dot {
+    background: #2f9e44;
+}
+
+.connection--closed .connection__dot {
+    background: #d64545;
+}
+
+.button--secondary {
+    border-color: #bcccdc;
+    background: #ffffff;
+    color: #2f6fed;
+}
+
+.button--secondary:hover {
+    background: #f0f4f8;
+}
+
+.log {
+    max-height: 180px;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+    font-size: 14px;
+}
+
+.log__item {
+    display: flex;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid #eef2f6;
+}
+
+.log__time {
+    color: #7b8794;
+    font-variant-numeric: tabular-nums;
+}
+
+.log__empty {
+    padding: 12px 0;
+    color: #7b8794;
+}
+
+.row--changed {
+    background: #fff7db;
 }

@@ -25,6 +25,23 @@
                 <p class="empty-state">Данные ещё не загружены.</p>
             </div>
         </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>WebSocket: обновления в реальном времени</h2>
+                <div class="live-actions">
+                    <span id="ws-status" class="connection connection--connecting">
+                        <span class="connection__dot"></span>
+                        <span id="ws-status-text">Подключение…</span>
+                    </span>
+                    <button type="button" id="ws-ping" class="button button--secondary">Проверить связь</button>
+                </div>
+            </div>
+
+            <ul id="ws-log" class="log" aria-live="polite">
+                <li class="log__empty">Событий пока нет.</li>
+            </ul>
+        </section>
     </main>
 
     <script type="module" src="js/main.js"></script>
