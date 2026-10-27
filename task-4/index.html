@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор на JavaScript</title>
+  <meta name="description" content="Простой калькулятор: два числа, выбор одной арифметической операции и вывод результата.">
+  <meta name="theme-color" content="#1F3D2B">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+</head>
+
+<body>
+
+  <noscript>
+    <p class="noscript">Для калькулятора нужен JavaScript: включите его в браузере и обновите страницу.</p>
+  </noscript>
+
+  <main class="stage">
+    <section class="calculator" aria-labelledby="calculator-title">
+      <h1 class="calculator__title" id="calculator-title">Калькулятор</h1>
+      <p class="calculator__hint">Введите два числа и выберите операцию.</p>
+
+      <form class="calculator__form" id="calculator-form" novalidate>
+        <div class="calculator__row">
+          <label class="field">
+            <span class="field__label">Первое число</span>
+            <input class="field__input" type="number" id="num1" name="num1" step="any"
+              inputmode="decimal" autocomplete="off" placeholder="0">
+          </label>
+
+          <fieldset class="operations">
+            <legend class="operations__legend">Операция</legend>
+            <label class="operation">
+              <input class="operation__input" type="radio" name="op" value="add" checked>
+              <span class="operation__sign" aria-hidden="true">+</span>
+              <span class="operation__name">Сложение</span>
+            </label>
+            <label class="operation">
+              <input class="operation__input" type="radio" name="op" value="sub">
+              <span class="operation__sign" aria-hidden="true">−</span>
+              <span class="operation__name">Вычитание</span>
+            </label>
+            <label class="operation">
+              <input class="operation__input" type="radio" name="op" value="mul">
+              <span class="operation__sign" aria-hidden="true">×</span>
+              <span class="operation__name">Умножение</span>
+            </label>
+            <label class="operation">
+              <input class="operation__input" type="radio" name="op" value="div">
+              <span class="operation__sign" aria-hidden="true">÷</span>
+              <span class="operation__name">Деление</span>
+            </label>
+          </fieldset>
+
+          <label class="field">
+            <span class="field__label">Второе число</span>
+            <input class="field__input" type="number" id="num2" name="num2" step="any"
+              inputmode="decimal" autocomplete="off" placeholder="0">
+          </label>
+        </div>
+
+        <button class="btn btn--primary calculator__submit" type="submit" id="calculate">=</button>
+      </form>
+
+      <div class="result-block" aria-live="polite" aria-atomic="true">
+        <p class="result-block__label">Результат</p>
+        <output class="result-block__value" id="result" for="num1 num2">—</output>
+      </div>
+    </section>
+  </main>
+
+</body>
+
+</html>
