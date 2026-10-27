@@ -15,13 +15,18 @@
         <section class="panel">
             <div class="panel-header">
                 <h2>Расписание рейсов</h2>
-                <button type="button" id="load-data" class="button">Загрузить данные</button>
+                <div class="load-control">
+                    <button type="button" id="load-data" class="button">Загрузить данные из JSON-файла</button>
+                    <p id="load-status" class="load-status" role="status"></p>
+                </div>
             </div>
 
-            <div id="flights" class="flights">
+            <div id="flights" class="flights" aria-live="polite">
                 <p class="empty-state">Данные ещё не загружены.</p>
             </div>
         </section>
     </main>
+
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
