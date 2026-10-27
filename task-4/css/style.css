@@ -196,7 +196,7 @@ p { margin: 0; }
 /* Всегда отдельная строка под полями, даже на широком экране */
 .operations {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: var(--space-2);
   margin-top: var(--space-5);
 }

@@ -11,7 +11,6 @@
 
 /* ---------- Ссылки на элементы страницы ---------- */
 
-const operationsEl = document.getElementById('operations');
 const resetButton = document.getElementById('reset');
 const inputA = document.getElementById('num1');
 const inputB = document.getElementById('num2');
@@ -40,11 +39,69 @@ function div(a, b) {
   return a / b;
 }
 
+/** Корень n-й степени: Math.pow(a, 1/n); для отрицательного a — только нечётная n. */
+function root(a, n) {
+  if (a < 0) {
+    return -Math.pow(-a, 1 / n);
+  }
+
+  return Math.pow(a, 1 / n);
+}
+
+/** Возведение в степень. */
+function pow(a, b) {
+  return Math.pow(a, b);
+}
+
+/* Проверки перед вычислением дополнительных операций */
+
+function validateRoot(a, n) {
+  if (n <= 0) {
+    return 'Степень корня должна быть больше нуля.';
+  }
+
+  if (a < 0 && !(Number.isInteger(n) && Math.abs(n % 2) === 1)) {
+    return 'Корень такой степени из отрицательного числа не существует.';
+  }
+
+  return null;
+}
+
+function validatePower(a, b) {
+  if (a === 0 && b === 0) {
+    return 'Ноль в нулевой степени не определён.';
+  }
+
+  if (a === 0 && b < 0) {
+    return 'Ноль нельзя возводить в отрицательную степень.';
+  }
+
+  if (a < 0 && !Number.isInteger(b)) {
+    return 'Отрицательное число нельзя возвести в дробную степень.';
+  }
+
+  return null;
+}
+
 const OPERATIONS = {
   add: { sign: '+', calculate: add },
   sub: { sign: '−', calculate: sub },
   mul: { sign: '×', calculate: mul },
   div: { sign: '÷', calculate: div },
+  root: {
+    sign: '√',
+    calculate: root,
+    validate: validateRoot,
+    expression: (a, b, result) =>
+      `${formatBase(a)}^(1/${formatNumber(b)}) = ${formatNumber(result)}`,
+  },
+  pow: {
+    sign: '^',
+    calculate: pow,
+    validate: validatePower,
+    expression: (a, b, result) =>
+      `${formatBase(a)}^${formatExponent(b)} = ${formatNumber(result)}`,
+  },
 };
 
 /* ---------- Пункт 4. Получение значений ---------- */
@@ -97,6 +154,20 @@ function formatNumber(value) {
   return String(Number(value.toPrecision(15)));
 }
 
+/** Отрицательное основание — в скобках: (-8)^3, а не -8^3. */
+function formatBase(value) {
+  const text = formatNumber(value);
+
+  return value < 0 ? `(${text})` : text;
+}
+
+/** Отрицательный показатель — в скобках: 2^(-1). */
+function formatExponent(value) {
+  const text = formatNumber(value);
+
+  return value < 0 ? `(${text})` : text;
+}
+
 /* ---------- Пункты 6–7. Обработка события и вывод ---------- */
 
 function calculate(operationKey) {
@@ -129,16 +200,32 @@ function calculate(operationKey) {
     return;
   }
 
+  const validationError = operation.validate
+    ? operation.validate(a.value, b.value)
+    : null;
+
+  if (validationError) {
+    showError(validationError);
+    return;
+  }
+
   const result = operation.calculate(a.value, b.value);
+
+  if (Number.isNaN(result)) {
+    showError('Результат не определён.');
+    return;
+  }
 
   if (!Number.isFinite(result)) {
     showError('Слишком большое число.');
     return;
   }
 
-  showResult(
-    `${formatNumber(a.value)} ${operation.sign} ${formatNumber(b.value)} = ${formatNumber(result)}`
-  );
+  const text = operation.expression
+    ? operation.expression(a.value, b.value, result)
+    : `${formatNumber(a.value)} ${operation.sign} ${formatNumber(b.value)} = ${formatNumber(result)}`;
+
+  showResult(text);
 }
 
 function handleOperationClick(event) {
@@ -187,7 +274,9 @@ function handleInputChange() {
   resultEl.classList.remove('is-error');
 }
 
-operationsEl.addEventListener('click', handleOperationClick);
+document.querySelectorAll('.operations').forEach((group) => {
+  group.addEventListener('click', handleOperationClick);
+});
 
 [inputA, inputB].forEach((input) => {
   input.addEventListener('keydown', handleEnter);
