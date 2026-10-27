@@ -7,6 +7,7 @@
   <title>Калькулятор на JavaScript</title>
   <meta name="description" content="Простой калькулятор: два числа, выбор арифметической операции и вывод результата.">
   <meta name="theme-color" content="#1F3D2B">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/main.js" defer></script>
 </head>
@@ -20,7 +21,10 @@
   <main class="stage">
     <section class="calculator" aria-labelledby="calculator-title">
       <div class="calculator__header">
-        <h1 class="calculator__title" id="calculator-title">Калькулятор</h1>
+        <div class="calculator__heading">
+          <img class="calculator__logo" src="assets/favicon.svg" alt="" width="36" height="36">
+          <h1 class="calculator__title" id="calculator-title">Калькулятор</h1>
+        </div>
         <button class="reset" type="button" id="reset">Сбросить</button>
       </div>
       <p class="calculator__hint">Введите два числа и нажмите нужную операцию.</p>
@@ -29,14 +33,14 @@
         <div class="calculator__row">
           <label class="field">
             <span class="field__label">Первое число</span>
-            <input class="field__input" type="number" id="num1" name="num1" step="any"
-              inputmode="decimal" autocomplete="off">
+            <input class="field__input" type="text" id="num1" name="num1" maxlength="10"
+              inputmode="decimal" autocomplete="off" spellcheck="false">
           </label>
 
           <label class="field">
             <span class="field__label">Второе число</span>
-            <input class="field__input" type="number" id="num2" name="num2" step="any"
-              inputmode="decimal" autocomplete="off">
+            <input class="field__input" type="text" id="num2" name="num2" maxlength="10"
+              inputmode="decimal" autocomplete="off" spellcheck="false">
           </label>
         </div>
 

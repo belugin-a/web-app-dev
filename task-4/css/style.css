@@ -116,6 +116,19 @@ p { margin: 0; }
   gap: var(--space-3) var(--space-4);
 }
 
+.calculator__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.calculator__logo {
+  flex: none;
+  width: 36px;
+  height: 36px;
+}
+
 .calculator__title {
   font-family: var(--font-display);
   font-size: clamp(28px, 3.5vw, 40px);
@@ -178,11 +191,6 @@ p { margin: 0; }
   border-color: var(--clay);
   box-shadow: 0 0 0 3px var(--clay-soft);
 }
-
-/* убираем стрелки у number-инпутов: они здесь не нужны */
-.field__input::-webkit-outer-spin-button,
-.field__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.field__input { -moz-appearance: textfield; }
 
 /* ---------- 5. Операции ---------- */
 /* Всегда отдельная строка под полями, даже на широком экране */
