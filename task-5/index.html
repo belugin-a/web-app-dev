@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фильмотека</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Фильмотека</h1>
+            <p class="subtitle">Коллекция наиболее известных научно-фантастических фильмов</p>
+        </header>
+
+        <section class="form-section">
+            <h2>Добавить фильм</h2>
+            <form id="addFilmForm" class="film-form">
+                <div class="form-group">
+                    <label for="filmTitle">Название</label>
+                    <input type="text" id="filmTitle" name="title" placeholder="Например: Интерстеллар" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="filmGenre">Жанр (через запятую)</label>
+                    <input type="text" id="filmGenre" name="genre" placeholder="Например: Научная фантастика, Драма" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="filmDirector">Режиссер</label>
+                    <input type="text" id="filmDirector" name="director" placeholder="Например: Кристофер Нолан" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="filmYear">Год выпуска</label>
+                    <input type="number" id="filmYear" name="year" placeholder="Например: 2014" min="1888" max="2100" required>
+                </div>
+
+                <button type="submit" class="submit-btn">Добавить фильм</button>
+            </form>
+        </section>
+
+        <section class="table-section">
+            <h2>Список фильмов</h2>
+            <div class="table-wrapper">
+                <table class="films-table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Жанр</th>
+                            <th>Режиссер</th>
+                            <th>Год выпуска</th>
+                        </tr>
+                    </thead>
+                    <tbody id="filmsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
