@@ -268,8 +268,53 @@ function handleNumberKeydown(event) {
   }
 }
 
+/**
+ * Приводит содержимое поля к допустимому виду:
+ *  - знак «+» или «−» только первым символом и только один;
+ *  - только один десятичный разделитель («.» или «,»);
+ *  - остаются только цифры.
+ * Работает и для набора с клавиатуры, и для вставки из буфера.
+ */
+function sanitizeNumberField(input) {
+  const original = input.value;
+  const caret = input.selectionStart === null ? original.length : input.selectionStart;
+
+  let result = '';
+  let newCaret = caret === 0 ? 0 : null;
+  let separatorUsed = false;
+
+  for (let i = 0; i < original.length; i += 1) {
+    const char = original[i];
+    let keep = false;
+
+    if (i === 0 && (char === '+' || char === '-')) {
+      keep = true;
+    } else if (/[0-9]/.test(char)) {
+      keep = true;
+    } else if ((char === '.' || char === ',') && !separatorUsed) {
+      separatorUsed = true;
+      keep = true;
+    }
+
+    if (keep) {
+      result += char;
+    }
+
+    if (i + 1 === caret) {
+      newCaret = result.length;
+    }
+  }
+
+  if (result !== original) {
+    const position = newCaret === null ? result.length : Math.min(newCaret, result.length);
+    input.value = result;
+    input.setSelectionRange(position, position);
+  }
+}
+
 /* Любое изменение поля делает старый результат неактуальным */
-function handleInputChange() {
+function handleInputChange(event) {
+  sanitizeNumberField(event.target);
   resultEl.textContent = RESULT_PLACEHOLDER;
   resultEl.classList.remove('is-error');
 }
