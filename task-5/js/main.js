@@ -137,24 +137,154 @@ function getFilmsByDirector(filmsArray, director) {
   return filtered;
 }
 
-// Функция для отображения всех фильмов в виде таблицы (п.7)
+// Состояние отображения таблицы: выбранные фильтры и сортировка
+const viewState = {
+  genre: null,        // выбранный жанр (п.3)
+  director: null,     // выбранный режиссер (п.5)
+  afterYear: null,    // "выпущены после года" (п.4)
+  sortByTitle: false  // сортировка по названию выключена по умолчанию (п.2)
+};
+
+// Применяет выбранные фильтры и сортировку, используя готовые функции п.2-5
+function applyViewState(filmsArray) {
+  let result = filmsArray;
+
+  if (viewState.genre) {
+    result = getFilmsByGenre(result, viewState.genre);
+  }
+
+  if (viewState.director) {
+    result = getFilmsByDirector(result, viewState.director);
+  }
+
+  if (viewState.afterYear !== null) {
+    result = getFilmsAfterYear(result, viewState.afterYear);
+  }
+
+  if (viewState.sortByTitle) {
+    // getSortedFilmTitles возвращает только названия,
+    // поэтому восстанавливаем объекты фильмов в полученном порядке
+    const sortedTitles = getSortedFilmTitles(result);
+    result = sortedTitles.map(title => result.find(film => film["название"] === title));
+  }
+
+  return result;
+}
+
+// Создает чип активного фильтра
+function createFilterChip(label, filterKey) {
+  const chip = document.createElement('span');
+  chip.className = 'filter-chip';
+
+  const text = document.createElement('span');
+  text.textContent = label;
+  chip.appendChild(text);
+
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'filter-chip-remove';
+  removeBtn.setAttribute('aria-label', 'Снять фильтр: ' + label);
+  removeBtn.textContent = '×';
+  removeBtn.addEventListener('click', function() {
+    viewState[filterKey] = null;
+    if (filterKey === 'afterYear') {
+      document.getElementById('yearFilter').value = '';
+    }
+    renderFilmsTable();
+  });
+
+  chip.appendChild(removeBtn);
+  return chip;
+}
+
+// Обновляет шапку таблицы: активные фильтры, индикатор сортировки, счетчик
+function updateTableHeader(totalCount, visibleCount) {
+  const activeFilters = document.getElementById('activeFilters');
+  const summary = document.getElementById('tableSummary');
+  const sortButton = document.getElementById('sortByTitle');
+  const sortIndicator = document.getElementById('sortIndicator');
+
+  activeFilters.innerHTML = '';
+
+  if (viewState.genre) {
+    activeFilters.appendChild(createFilterChip('Жанр: ' + viewState.genre, 'genre'));
+  }
+  if (viewState.director) {
+    activeFilters.appendChild(createFilterChip('Режиссер: ' + viewState.director, 'director'));
+  }
+  if (viewState.afterYear !== null) {
+    activeFilters.appendChild(createFilterChip('После ' + viewState.afterYear + ' года', 'afterYear'));
+  }
+
+  activeFilters.hidden = activeFilters.children.length === 0;
+
+  sortButton.setAttribute('aria-pressed', viewState.sortByTitle ? 'true' : 'false');
+  sortButton.classList.toggle('is-active', viewState.sortByTitle);
+  sortIndicator.textContent = viewState.sortByTitle ? '▲' : '⇅';
+
+  summary.textContent = 'Показано ' + visibleCount + ' из ' + totalCount + ' фильмов';
+}
+
+// Функция для отображения фильмов в виде таблицы с учетом фильтров (п.7)
 function renderFilmsTable() {
   const tableBody = document.getElementById('filmsTableBody');
   if (!tableBody) return;
 
+  const visibleFilms = applyViewState(films);
+
   tableBody.innerHTML = '';
 
-  films.forEach(film => {
+  if (visibleFilms.length === 0) {
+    const emptyRow = document.createElement('tr');
+    const emptyCell = document.createElement('td');
+    emptyCell.colSpan = 4;
+    emptyCell.className = 'empty-row';
+    emptyCell.textContent = 'По выбранным условиям фильмов не найдено';
+    emptyRow.appendChild(emptyCell);
+    tableBody.appendChild(emptyRow);
+  }
+
+  visibleFilms.forEach(film => {
     const row = document.createElement('tr');
 
     const titleCell = document.createElement('td');
     titleCell.textContent = film["название"];
 
     const genreCell = document.createElement('td');
-    genreCell.textContent = film["жанр"].join(', ');
+    genreCell.className = 'genre-cell';
+    film["жанр"].forEach(genre => {
+      const genreBtn = document.createElement('button');
+      genreBtn.type = 'button';
+      genreBtn.className = 'filter-tag';
+      genreBtn.dataset.genre = genre;
+      genreBtn.textContent = genre;
+
+      if (viewState.genre === genre) {
+        genreBtn.classList.add('is-active');
+        genreBtn.setAttribute('aria-pressed', 'true');
+      } else {
+        genreBtn.setAttribute('aria-pressed', 'false');
+      }
+
+      genreCell.appendChild(genreBtn);
+    });
 
     const directorCell = document.createElement('td');
-    directorCell.textContent = film["режиссер"];
+    directorCell.className = 'director-cell';
+    const directorBtn = document.createElement('button');
+    directorBtn.type = 'button';
+    directorBtn.className = 'filter-link';
+    directorBtn.dataset.director = film["режиссер"];
+    directorBtn.textContent = film["режиссер"];
+
+    if (viewState.director === film["режиссер"]) {
+      directorBtn.classList.add('is-active');
+      directorBtn.setAttribute('aria-pressed', 'true');
+    } else {
+      directorBtn.setAttribute('aria-pressed', 'false');
+    }
+
+    directorCell.appendChild(directorBtn);
 
     const yearCell = document.createElement('td');
     yearCell.textContent = film["год выпуска"];
@@ -165,6 +295,58 @@ function renderFilmsTable() {
     row.appendChild(yearCell);
 
     tableBody.appendChild(row);
+  });
+
+  updateTableHeader(films.length, visibleFilms.length);
+}
+
+// Обработчики сортировки, фильтров по клику и сброса
+function initTableControls() {
+  const tableBody = document.getElementById('filmsTableBody');
+  const sortButton = document.getElementById('sortByTitle');
+  const resetButton = document.getElementById('resetFilters');
+  const yearInput = document.getElementById('yearFilter');
+
+  // Клик по жанру или режиссеру в таблице
+  tableBody.addEventListener('click', function(e) {
+    const genreBtn = e.target.closest('[data-genre]');
+    if (genreBtn) {
+      const genre = genreBtn.dataset.genre;
+      viewState.genre = viewState.genre === genre ? null : genre;
+      renderFilmsTable();
+      return;
+    }
+
+    const directorBtn = e.target.closest('[data-director]');
+    if (directorBtn) {
+      const director = directorBtn.dataset.director;
+      viewState.director = viewState.director === director ? null : director;
+      renderFilmsTable();
+    }
+  });
+
+  // Сортировка по названию: включить / выключить
+  sortButton.addEventListener('click', function() {
+    viewState.sortByTitle = !viewState.sortByTitle;
+    renderFilmsTable();
+  });
+
+  // Фильтр "выпущены после указанного года"
+  yearInput.addEventListener('input', function() {
+    const value = yearInput.value.trim();
+    const yearNumber = Number(value);
+    viewState.afterYear = value === '' || Number.isNaN(yearNumber) ? null : yearNumber;
+    renderFilmsTable();
+  });
+
+  // Сброс всех фильтров и сортировки одним действием
+  resetButton.addEventListener('click', function() {
+    viewState.genre = null;
+    viewState.director = null;
+    viewState.afterYear = null;
+    viewState.sortByTitle = false;
+    yearInput.value = '';
+    renderFilmsTable();
   });
 }
 
@@ -207,4 +389,5 @@ function initForm() {
 document.addEventListener('DOMContentLoaded', function() {
   renderFilmsTable();
   initForm();
+  initTableControls();
 });

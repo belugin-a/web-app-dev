@@ -120,6 +120,192 @@ section h2 {
     overflow-x: auto;
 }
 
+.table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    background-color: #f8f9fa;
+    border: 1px solid #e6e8eb;
+    border-radius: 6px;
+}
+
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex-basis: 100%;
+}
+
+.active-filters[hidden] {
+    display: none;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px 4px 10px;
+    background-color: #e8ecff;
+    color: #3a4bb5;
+    border-radius: 999px;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.filter-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    background-color: transparent;
+    color: #3a4bb5;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1em;
+    line-height: 1;
+    transition: background-color 0.2s;
+}
+
+.filter-chip-remove:hover {
+    background-color: #cfd7ff;
+}
+
+.year-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.year-filter input {
+    width: 130px;
+    padding: 7px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1em;
+    transition: border-color 0.2s;
+}
+
+.year-filter input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.reset-btn {
+    margin-left: auto;
+    padding: 8px 16px;
+    background-color: #fff;
+    color: #b02a37;
+    border: 1px solid #e3b5ba;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9em;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.reset-btn:hover {
+    background-color: #fdecee;
+    border-color: #d69aa1;
+}
+
+.table-summary {
+    margin-bottom: 10px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sort-btn:hover {
+    color: #4a5ac9;
+}
+
+.sort-btn.is-active {
+    color: #4a5ac9;
+}
+
+.sort-indicator {
+    font-size: 0.9em;
+    opacity: 0.7;
+}
+
+.filter-tag {
+    display: inline-block;
+    margin: 2px 4px 2px 0;
+    padding: 3px 9px;
+    background-color: #f1f3f5;
+    color: #444;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.85em;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.filter-tag:hover {
+    background-color: #e3e8ff;
+    color: #3a4bb5;
+    border-color: #c3cdfb;
+}
+
+.filter-tag.is-active {
+    background-color: #667eea;
+    color: #fff;
+    border-color: #667eea;
+}
+
+.filter-link {
+    padding: 0;
+    background: none;
+    border: none;
+    color: #333;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    border-bottom: 1px dashed #b8bcc4;
+}
+
+.filter-link:hover {
+    color: #4a5ac9;
+    border-bottom-color: #4a5ac9;
+}
+
+.filter-link.is-active {
+    color: #4a5ac9;
+    font-weight: 600;
+    border-bottom-style: solid;
+    border-bottom-color: #4a5ac9;
+}
+
+.empty-row {
+    text-align: center;
+    color: #777;
+    padding: 24px 16px;
+    font-style: italic;
+}
+
 .films-table {
     width: 100%;
     border-collapse: collapse;
@@ -175,6 +361,14 @@ section h2 {
     
     .film-form {
         grid-template-columns: 1fr;
+    }
+
+    .reset-btn {
+        margin-left: 0;
+    }
+
+    .year-filter {
+        flex-wrap: wrap;
     }
 
     .films-table {

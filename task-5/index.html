@@ -42,11 +42,29 @@
 
         <section class="table-section">
             <h2>Список фильмов</h2>
+
+            <div class="table-toolbar">
+                <div class="active-filters" id="activeFilters" hidden></div>
+
+                <div class="year-filter">
+                    <label for="yearFilter">Год выпуска: после</label>
+                    <input type="number" id="yearFilter" min="1888" max="2100">
+                </div>
+
+                <button type="button" id="resetFilters" class="reset-btn">Сбросить фильтры</button>
+            </div>
+
+            <p class="table-summary" id="tableSummary"></p>
+
             <div class="table-wrapper">
                 <table class="films-table">
                     <thead>
                         <tr>
-                            <th>Название</th>
+                            <th>
+                                <button type="button" id="sortByTitle" class="sort-btn" aria-pressed="false">
+                                    Название <span class="sort-indicator" id="sortIndicator">⇅</span>
+                                </button>
+                            </th>
                             <th>Жанр</th>
                             <th>Режиссер</th>
                             <th>Год выпуска</th>
