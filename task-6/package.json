@@ -1,0 +1,13 @@
+{
+  "name": "task-6-flight-board",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Практическая работа №6: JSON, XML, WebSocket и Server Sent Events",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
