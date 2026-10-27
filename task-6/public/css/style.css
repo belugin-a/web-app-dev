@@ -223,6 +223,21 @@ body {
     color: #7b8794;
 }
 
+.log__item--warning {
+    border-left: 3px solid #f08c00;
+    padding-left: 8px;
+}
+
+.log__item--danger {
+    border-left: 3px solid #d64545;
+    padding-left: 8px;
+}
+
+.log__item--success {
+    border-left: 3px solid #2f9e44;
+    padding-left: 8px;
+}
+
 .row--changed {
     background: #fff7db;
 }

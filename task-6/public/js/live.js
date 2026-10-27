@@ -1,11 +1,16 @@
 import { applyFlightUpdate, replaceFlights } from './store.js';
 
 const MAX_LOG_ITEMS = 8;
+const MAX_FEED_ITEMS = 12;
 
-const statusElement = document.querySelector('#ws-status');
-const statusText = document.querySelector('#ws-status-text');
-const logElement = document.querySelector('#ws-log');
+const wsStatusElement = document.querySelector('#ws-status');
+const wsStatusText = document.querySelector('#ws-status-text');
+const wsLogElement = document.querySelector('#ws-log');
 const pingButton = document.querySelector('#ws-ping');
+
+const sseStatusElement = document.querySelector('#sse-status');
+const sseStatusText = document.querySelector('#sse-status-text');
+const sseFeedElement = document.querySelector('#sse-feed');
 
 let socket = null;
 
@@ -22,6 +27,30 @@ export function initLiveUpdates() {
   });
 }
 
+export function initSseFeed() {
+  const source = new EventSource('/events');
+
+  source.addEventListener('open', () => {
+    setConnectionState(sseStatusElement, sseStatusText, 'open', 'Подключено');
+  });
+
+  source.addEventListener('error', () => {
+    setConnectionState(sseStatusElement, sseStatusText, 'closed', 'Переподключение…');
+  });
+
+  source.addEventListener('announcement', (event) => {
+    let announcement;
+
+    try {
+      announcement = JSON.parse(event.data);
+    } catch {
+      return;
+    }
+
+    addFeedItem(announcement);
+  });
+}
+
 export function requestSnapshot() {
   if (socket?.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify({ type: 'refresh' }));
@@ -29,13 +58,13 @@ export function requestSnapshot() {
 }
 
 function connect() {
-  setConnectionState('connecting', 'Подключение…');
+  setConnectionState(wsStatusElement, wsStatusText, 'connecting', 'Подключение…');
 
   const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
   socket = new WebSocket(`${protocol}://${location.host}/ws`);
 
   socket.addEventListener('open', () => {
-    setConnectionState('open', 'Подключено');
+    setConnectionState(wsStatusElement, wsStatusText, 'open', 'Подключено');
     addLog('Соединение установлено');
   });
 
@@ -44,7 +73,7 @@ function connect() {
   });
 
   socket.addEventListener('close', () => {
-    setConnectionState('closed', 'Отключено');
+    setConnectionState(wsStatusElement, wsStatusText, 'closed', 'Отключено');
     addLog('Соединение закрыто, переподключение через 3 с');
     setTimeout(connect, 3000);
   });
@@ -81,31 +110,48 @@ function handleMessage(rawMessage) {
   }
 }
 
-function setConnectionState(modifier, text) {
-  statusElement.classList.remove('connection--connecting', 'connection--open', 'connection--closed');
-  statusElement.classList.add(`connection--${modifier}`);
-  statusText.textContent = text;
+function setConnectionState(element, textElement, modifier, text) {
+  element.classList.remove('connection--connecting', 'connection--open', 'connection--closed');
+  element.classList.add(`connection--${modifier}`);
+  textElement.textContent = text;
 }
 
 function addLog(text) {
-  logElement.querySelector('.log__empty')?.remove();
+  appendListItem(wsLogElement, {
+    text,
+    time: new Date(),
+    maxItems: MAX_LOG_ITEMS,
+  });
+}
+
+function addFeedItem(announcement) {
+  appendListItem(sseFeedElement, {
+    text: announcement.text,
+    time: announcement.at ? new Date(announcement.at) : new Date(),
+    modifier: announcement.level,
+    maxItems: MAX_FEED_ITEMS,
+  });
+}
+
+function appendListItem(list, { text, time, modifier = 'info', maxItems }) {
+  list.querySelector('.log__empty')?.remove();
 
   const item = document.createElement('li');
-  item.className = 'log__item';
+  item.className = `log__item log__item--${modifier}`;
 
-  const time = document.createElement('span');
-  time.className = 'log__time';
-  time.textContent = new Date().toLocaleTimeString('ru-RU', { hour12: false });
+  const timeElement = document.createElement('span');
+  timeElement.className = 'log__time';
+  timeElement.textContent = time.toLocaleTimeString('ru-RU', { hour12: false });
 
-  const message = document.createElement('span');
-  message.textContent = text;
+  const messageElement = document.createElement('span');
+  messageElement.textContent = text;
 
-  item.append(time, message);
-  logElement.append(item);
+  item.append(timeElement, messageElement);
+  list.append(item);
 
-  while (logElement.children.length > MAX_LOG_ITEMS) {
-    logElement.firstElementChild.remove();
+  while (list.children.length > maxItems) {
+    list.firstElementChild.remove();
   }
 
-  logElement.scrollTop = logElement.scrollHeight;
+  list.scrollTop = list.scrollHeight;
 }

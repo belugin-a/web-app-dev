@@ -1,5 +1,5 @@
 import { JSON_SOURCE, loadFlightsFromJson } from './json-view.js';
-import { initLiveUpdates, requestSnapshot } from './live.js';
+import { initLiveUpdates, initSseFeed, requestSnapshot } from './live.js';
 import { escapeHtml } from './store.js';
 
 const loadButton = document.querySelector('#load-data');
@@ -7,6 +7,7 @@ const loadStatus = document.querySelector('#load-status');
 const flightsContainer = document.querySelector('#flights');
 
 initLiveUpdates();
+initSseFeed();
 
 loadButton.addEventListener('click', async () => {
   const buttonText = loadButton.textContent;

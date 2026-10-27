@@ -42,6 +42,20 @@
                 <li class="log__empty">Событий пока нет.</li>
             </ul>
         </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Server Sent Events: погода в городах назначения</h2>
+                <span id="sse-status" class="connection connection--connecting">
+                    <span class="connection__dot"></span>
+                    <span id="sse-status-text">Подключение…</span>
+                </span>
+            </div>
+
+            <ul id="sse-feed" class="log" aria-live="polite">
+                <li class="log__empty">Ожидание сводок погоды…</li>
+            </ul>
+        </section>
     </main>
 
     <script type="module" src="js/main.js"></script>

@@ -19,6 +19,83 @@ const wss = new WebSocketServer({ server, path: '/ws' });
 app.use(express.static(path.join(projectRoot, 'public')));
 app.use('/data', express.static(path.join(projectRoot, 'data')));
 
+const SSE_HISTORY = 5;
+const sseClients = new Set();
+const announcements = [];
+
+const WEATHER_CONDITIONS = [
+  { text: 'ясно', level: 'info' },
+  { text: 'малооблачно', level: 'info' },
+  { text: 'облачно', level: 'info' },
+  { text: 'небольшой дождь', level: 'info' },
+  { text: 'сильный дождь', level: 'warning' },
+  { text: 'гроза', level: 'warning' },
+  { text: 'туман', level: 'warning' },
+  { text: 'снегопад', level: 'warning' },
+];
+
+function formatAnnouncement(announcement) {
+  return `event: announcement\ndata: ${JSON.stringify(announcement)}\n\n`;
+}
+
+function pushAnnouncement(text, level = 'info') {
+  const announcement = {
+    text,
+    level,
+    at: new Date().toISOString(),
+  };
+
+  announcements.push(announcement);
+
+  if (announcements.length > 20) {
+    announcements.shift();
+  }
+
+  const payload = formatAnnouncement(announcement);
+
+  for (const client of sseClients) {
+    client.write(payload);
+  }
+}
+
+function pushWeather() {
+  const cities = [...new Set(flights.map((flight) => flight.city))];
+  const city = cities[Math.floor(Math.random() * cities.length)];
+  const condition = WEATHER_CONDITIONS[Math.floor(Math.random() * WEATHER_CONDITIONS.length)];
+  const temperature = Math.floor(Math.random() * 19) - 3;
+  const wind = 1 + Math.floor(Math.random() * 9);
+  const sign = temperature > 0 ? '+' : '';
+
+  pushAnnouncement(
+    `${city}: ${sign}${temperature} °C, ${condition.text}, ветер ${wind} м/с`,
+    condition.level,
+  );
+}
+
+app.get('/events', (request, response) => {
+  response.writeHead(200, {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  });
+
+  response.write('retry: 3000\n\n');
+
+  for (const announcement of announcements.slice(-SSE_HISTORY)) {
+    response.write(formatAnnouncement(announcement));
+  }
+
+  sseClients.add(response);
+  request.on('close', () => sseClients.delete(response));
+});
+
+setInterval(() => {
+  for (const client of sseClients) {
+    client.write(': keep-alive\n\n');
+  }
+}, 15000).unref();
+
 const STATUS_FLOW = {
   'По расписанию': 'Регистрация',
   'Регистрация': 'Посадка',
@@ -87,8 +164,13 @@ setInterval(() => {
   broadcast({ type: 'flight-updated', flight });
 }, 5000);
 
+setInterval(pushWeather, 7000);
+
 const port = Number(process.env.PORT) || 3000;
 
 server.listen(port, () => {
   console.log(`Табло авиарейсов: http://localhost:${port}`);
+  pushWeather();
+  pushWeather();
+  pushWeather();
 });
