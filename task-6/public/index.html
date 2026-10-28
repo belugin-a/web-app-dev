@@ -7,126 +7,99 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <main class="page">
-        <header class="page-header">
-            <h1>Табло авиарейсов</h1>
-        </header>
-
-        <p class="panel-caption">Из XML берутся только стойки регистрации и терминал; остальные колонки — из JSON.</p>
-
-        <section class="panel">
-            <div class="panel-header">
-                <div class="panel-heading">
-                    <h2>Расписание рейсов</h2>
-                    <button type="button" id="open-flight-dialog" class="button button--icon" aria-label="Добавить рейс" title="Добавить рейс">+</button>
-                </div>
-                <div class="load-controls">
-                    <div class="load-control">
-                        <button type="button" id="load-data" class="button">Загрузить данные из JSON-файла</button>
-                        <p id="load-status" class="load-status" role="status"></p>
+    <main class="app">
+        <div class="app__grid">
+            <section class="panel panel--schedule">
+                <div class="panel__header">
+                    <div class="brand">
+                        <svg class="brand__logo" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 16v-2l-8-4.5V3.5a1.5 1.5 0 0 0-3 0v6L2 14v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5L21 16z" fill="currentColor"/>
+                        </svg>
+                        <h1 class="brand__title">Табло авиарейсов</h1>
                     </div>
-                    <div class="load-control">
-                        <button type="button" id="load-xml" class="button">Загрузить данные из XML-файла</button>
-                        <p id="xml-status" class="load-status" role="status"></p>
+
+                    <div class="toolbar">
+                        <button type="button" id="load-data" class="button button--ghost" title="Загрузить данные из JSON">
+                            <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 4v10"/>
+                                <path d="m8 10 4 4 4-4"/>
+                                <path d="M5 20h14"/>
+                            </svg>
+                            <span>JSON</span>
+                        </button>
+                        <button type="button" id="load-xml" class="button button--ghost" title="Загрузить данные из XML">
+                            <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 4v10"/>
+                                <path d="m8 10 4 4 4-4"/>
+                                <path d="M5 20h14"/>
+                            </svg>
+                            <span>XML</span>
+                        </button>
+                        <button type="button" id="open-flight-dialog" class="button button--icon" aria-label="Добавить рейс" title="Добавить рейс">+</button>
+                        <button type="button" id="open-terminal-dialog" class="button button--icon button--mono" aria-label="Терминалы" title="Терминалы">T→</button>
                     </div>
                 </div>
-            </div>
 
-            <p id="flight-status" class="flight-status" role="status"></p>
+                <p id="action-status" class="action-status" role="status"></p>
 
-            <div class="filters">
-                <label class="field">
-                    <span class="field__label">Статус</span>
-                    <select id="filter-status">
-                        <option value="all">Все статусы</option>
-                    </select>
-                </label>
-                <label class="field">
-                    <span class="field__label">Город</span>
-                    <input id="filter-city" type="search" placeholder="Например: Москва" autocomplete="off">
-                </label>
-                <label class="field">
-                    <span class="field__label">Сортировка по времени</span>
-                    <select id="sort-time">
-                        <option value="none">Без сортировки</option>
-                        <option value="asc">По возрастанию</option>
-                        <option value="desc">По убыванию</option>
-                    </select>
-                </label>
-                <div class="filters__actions">
-                    <button type="button" id="reset-view" class="button button--secondary">Сбросить</button>
-                </div>
-            </div>
-
-            <div id="flights" class="flights" aria-live="polite">
-                <p class="empty-state">Данные ещё не загружены.</p>
-            </div>
-        </section>
-
-        <section class="panel">
-            <div class="panel-header">
-                <h2>XML: извлечение и изменение</h2>
-            </div>
-
-            <div class="xml-actions">
-                <div class="xml-group">
+                <div class="filters">
                     <label class="field">
-                        <span class="field__label">Терминал</span>
-                        <select id="xml-source"></select>
+                        <span class="field__label">Статус</span>
+                        <select id="filter-status">
+                            <option value="all">Все статусы</option>
+                        </select>
                     </label>
-                    <button type="button" id="xml-extract" class="button button--secondary">Извлечь рейсы</button>
-                </div>
-                <div class="xml-group">
                     <label class="field">
-                        <span class="field__label">Перевести в терминал</span>
-                        <select id="xml-target"></select>
+                        <span class="field__label">Город</span>
+                        <input id="filter-city" type="search" placeholder="Например: Москва" autocomplete="off">
                     </label>
-                    <button type="button" id="xml-move" class="button">Сменить терминал</button>
+                    <label class="field">
+                        <span class="field__label">Сортировка</span>
+                        <select id="sort-time">
+                            <option value="none">Без сортировки</option>
+                            <option value="asc">По времени ↑</option>
+                            <option value="desc">По времени ↓</option>
+                        </select>
+                    </label>
+                    <div class="filters__actions">
+                        <button type="button" id="reset-view" class="button button--ghost" title="Сбросить фильтры" aria-label="Сбросить фильтры">↺</button>
+                    </div>
                 </div>
-            </div>
 
-            <div id="xml-result">
-                <p class="empty-state">Загрузите XML и выполните операцию.</p>
-            </div>
-        </section>
+                <div id="flights" class="table-wrap" aria-live="polite"></div>
+                <p id="flights-summary" class="flights-summary"></p>
+            </section>
 
-        <section class="panel">
-            <div class="panel-header">
-                <h2>WebSocket: обновления в реальном времени</h2>
-                <div class="live-actions">
-                    <span id="ws-status" class="connection connection--connecting">
-                        <span class="connection__dot"></span>
-                        <span id="ws-status-text">Подключение…</span>
-                    </span>
-                    <button type="button" id="ws-ping" class="button button--secondary">Проверить связь</button>
-                </div>
-            </div>
+            <aside class="live-column">
+                <section class="panel panel--live">
+                    <div class="panel__header">
+                        <h2>Обновления рейсов</h2>
+                        <button type="button" id="ws-status" class="connection connection--connecting" title="Проверить связь" aria-label="Проверить связь">
+                            <span class="connection__dot"></span>
+                            <span id="ws-status-text">Подключение…</span>
+                        </button>
+                    </div>
+                    <ul id="ws-log" class="log" aria-live="polite"></ul>
+                </section>
 
-            <ul id="ws-log" class="log" aria-live="polite">
-                <li class="log__empty">Событий пока нет.</li>
-            </ul>
-        </section>
-
-        <section class="panel">
-            <div class="panel-header">
-                <h2>Server Sent Events: погода в городах назначения</h2>
-                <span id="sse-status" class="connection connection--connecting">
-                    <span class="connection__dot"></span>
-                    <span id="sse-status-text">Подключение…</span>
-                </span>
-            </div>
-
-            <ul id="sse-feed" class="log" aria-live="polite">
-                <li class="log__empty">Ожидание сводок погоды…</li>
-            </ul>
-        </section>
-
+                <section class="panel panel--live">
+                    <div class="panel__header">
+                        <h2>Погода в городах</h2>
+                        <span id="sse-status" class="connection connection--connecting">
+                            <span class="connection__dot"></span>
+                            <span id="sse-status-text">Подключение…</span>
+                        </span>
+                    </div>
+                    <ul id="sse-feed" class="log" aria-live="polite"></ul>
+                </section>
+            </aside>
+        </div>
     </main>
 
     <dialog id="add-flight-dialog" class="dialog" aria-labelledby="add-flight-title">
         <div class="dialog__header">
             <h2 id="add-flight-title">Добавить рейс</h2>
-            <button type="button" id="close-flight-dialog" class="button button--icon button--secondary" aria-label="Закрыть">×</button>
+            <button type="button" id="close-flight-dialog" class="dialog__close" aria-label="Закрыть">×</button>
         </div>
 
         <form id="flight-form" class="flight-form">
@@ -152,12 +125,41 @@
             </label>
 
             <div class="dialog__actions">
-                <button type="button" id="cancel-flight-form" class="button button--secondary">Отмена</button>
-                <button type="submit" class="button">Добавить рейс</button>
+                <button type="button" id="cancel-flight-form" class="button button--ghost">Отмена</button>
+                <button type="submit" class="button button--primary">Добавить рейс</button>
             </div>
         </form>
 
         <p id="form-status" class="form-status" role="status"></p>
+    </dialog>
+
+    <dialog id="terminal-dialog" class="dialog" aria-labelledby="terminal-title">
+        <div class="dialog__header">
+            <h2 id="terminal-title">Терминалы</h2>
+            <button type="button" id="close-terminal-dialog" class="dialog__close" aria-label="Закрыть">×</button>
+        </div>
+
+        <div class="terminal-row">
+            <label class="field">
+                <span class="field__label">Из терминала</span>
+                <select id="xml-source"></select>
+            </label>
+            <button type="button" id="xml-extract" class="button button--ghost">Показать рейсы</button>
+        </div>
+
+        <div class="terminal-row">
+            <label class="field">
+                <span class="field__label">В терминал</span>
+                <select id="xml-target"></select>
+            </label>
+            <button type="button" id="xml-move" class="button button--primary">Переназначить</button>
+        </div>
+
+        <div id="xml-result" class="terminal-result">
+            <p class="empty-state">Выберите терминал и нажмите «Показать рейсы».</p>
+        </div>
+
+        <p id="terminal-status" class="form-status" role="status"></p>
     </dialog>
 
     <script type="module" src="js/main.js"></script>

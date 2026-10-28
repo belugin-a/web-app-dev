@@ -1,4 +1,5 @@
 import { resetJsonView } from './json-view.js';
+import { setActionStatus } from './ui.js';
 
 export function initFlightForm() {
   const dialog = document.querySelector('#add-flight-dialog');
@@ -7,13 +8,11 @@ export function initFlightForm() {
   const cancelButton = document.querySelector('#cancel-flight-form');
   const form = document.querySelector('#flight-form');
   const statusElement = document.querySelector('#form-status');
-  const panelStatus = document.querySelector('#flight-status');
   const submitButton = form.querySelector('button[type="submit"]');
 
   openButton.addEventListener('click', () => {
     statusElement.textContent = '';
     statusElement.classList.remove('form-status--error');
-    panelStatus.textContent = '';
     dialog.showModal();
     form.elements.number.focus();
   });
@@ -53,7 +52,7 @@ export function initFlightForm() {
       resetJsonView();
       form.reset();
       dialog.close();
-      panelStatus.textContent = `Рейс ${data.flight.number} добавлен и подсвечен в таблице`;
+      setActionStatus(`Рейс ${data.flight.number} добавлен`);
     } catch (error) {
       statusElement.textContent = `Не удалось добавить рейс: ${error.message}`;
       statusElement.classList.add('form-status--error');

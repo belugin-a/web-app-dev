@@ -130,88 +130,75 @@ export function applyFlightUpdate(flight) {
 export function renderFlights() {
   const container = document.querySelector('#flights');
 
-  if (state.flights.length === 0) {
-    container.innerHTML = '<p class="empty-state">Данные ещё не загружены.</p>';
+  if (!container) {
     return;
   }
 
   const visibleFlights = getVisibleFlights();
 
-  if (visibleFlights.length === 0) {
-    container.innerHTML = `
-      <p class="empty-state">По выбранным условиям рейсов не найдено.</p>
-      <p class="flights-summary">Показано 0 из ${state.totalCount}${describeView()}</p>
-    `;
-    return;
-  }
-
-  const showXmlDetails = state.xmlDetails.size > 0;
-
-  const rows = visibleFlights
-    .map((flight) => {
-      const details = state.xmlDetails.get(flight.id);
-
-      return `
-        <tr data-flight-id="${escapeHtml(flight.id)}" class="${[
-          highlightedIds.has(flight.id) ? 'row--changed' : '',
-          addedIds.has(flight.id) ? 'row--added' : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}">
-          <td class="flight-number">${escapeHtml(flight.number)}</td>
-          <td>${escapeHtml(flight.airline)}</td>
-          <td>${escapeHtml(flight.city)}</td>
-          <td class="flight-time">${escapeHtml(flight.time)}</td>
-          <td>${escapeHtml(flight.gate)}</td>
-          ${showXmlDetails ? `<td>${escapeHtml(details?.terminal ?? '—')}</td>` : ''}
-          ${showXmlDetails ? `<td>${escapeHtml(details?.checkIn ?? '—')}</td>` : ''}
-          <td><span class="status status--${statusModifier(flight.status)}">${escapeHtml(flight.status)}</span></td>
-        </tr>`;
-    })
-    .join('');
+  const rows =
+    visibleFlights.length > 0
+      ? visibleFlights.map(flightRow).join('')
+      : `<tr><td class="empty-cell" colspan="8">${
+          state.loaded ? 'По выбранным условиям рейсов не найдено' : 'Данные ещё не загружены'
+        }</td></tr>`;
 
   container.innerHTML = `
-    <div class="table-wrap">
-      <table class="flights-table">
-        <thead>
-          <tr>
-            <th scope="col">Рейс</th>
-            <th scope="col">Авиакомпания</th>
-            <th scope="col">Город</th>
-            <th scope="col">Время</th>
-            <th scope="col">Выход</th>
-            ${showXmlDetails ? '<th scope="col">Терминал</th>' : ''}
-            ${showXmlDetails ? '<th scope="col">Регистрация</th>' : ''}
-            <th scope="col">Статус</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-    <p class="flights-summary">Показано ${visibleFlights.length} из ${state.totalCount}${describeView()}</p>
+    <table class="flights-table">
+      <thead>
+        <tr>
+          <th scope="col">Рейс</th>
+          <th scope="col">Авиакомпания</th>
+          <th scope="col">Город</th>
+          <th scope="col">Время</th>
+          <th scope="col">Выход</th>
+          <th scope="col">Терминал</th>
+          <th scope="col">Регистрация</th>
+          <th scope="col">Статус</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
   `;
+
+  const summary = document.querySelector('#flights-summary');
+
+  if (summary) {
+    summary.textContent = state.loaded
+      ? `Показано ${visibleFlights.length} из ${state.totalCount}`
+      : '';
+  }
+}
+
+function flightRow(flight) {
+  const details = state.xmlDetails.get(flight.id);
+  const terminal = details?.terminal ?? '';
+  const checkIn = details?.checkIn ?? '';
+
+  const terminalCell = terminal
+    ? `<td class="cell-terminal" data-terminal="${escapeHtml(terminal)}" title="Открыть терминалы">${escapeHtml(terminal)}</td>`
+    : '<td class="cell-terminal">—</td>';
+
+  return `
+    <tr data-flight-id="${escapeHtml(flight.id)}" class="${[
+      highlightedIds.has(flight.id) ? 'row--changed' : '',
+      addedIds.has(flight.id) ? 'row--added' : '',
+    ]
+      .filter(Boolean)
+      .join(' ')}">
+      <td class="flight-number">${escapeHtml(flight.number)}</td>
+      <td>${escapeHtml(flight.airline)}</td>
+      <td>${escapeHtml(flight.city)}</td>
+      <td class="flight-time">${escapeHtml(flight.time)}</td>
+      <td>${escapeHtml(flight.gate)}</td>
+      ${terminalCell}
+      <td>${escapeHtml(checkIn || '—')}</td>
+      <td><span class="status status--${statusModifier(flight.status)}">${escapeHtml(flight.status)}</span></td>
+    </tr>`;
 }
 
 function statusModifier(status) {
   return STATUS_MODIFIERS[status] ?? 'unknown';
-}
-
-function describeView() {
-  const parts = [];
-
-  if (state.view.status !== 'all') {
-    parts.push(`статус «${state.view.status}»`);
-  }
-
-  if (state.view.city.trim() !== '') {
-    parts.push(`город содержит «${escapeHtml(state.view.city.trim())}»`);
-  }
-
-  if (state.view.sort !== 'none') {
-    parts.push(`сортировка по времени ${state.view.sort === 'asc' ? '↑' : '↓'}`);
-  }
-
-  return parts.length > 0 ? ` · ${parts.join(' · ')}` : '';
 }
 
 function highlight(flightId) {

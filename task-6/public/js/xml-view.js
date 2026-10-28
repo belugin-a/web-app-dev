@@ -1,4 +1,5 @@
 import { escapeHtml, highlightFlights, setXmlDetails, state } from './store.js';
+import { setActionStatus } from './ui.js';
 
 export const XML_SOURCE = 'data/flights.xml';
 
@@ -16,11 +17,15 @@ export async function loadFlightsFromXml() {
 }
 
 export function initXmlOperations() {
+  const dialog = document.querySelector('#terminal-dialog');
+  const openButton = document.querySelector('#open-terminal-dialog');
+  const closeButton = document.querySelector('#close-terminal-dialog');
   const sourceSelect = document.querySelector('#xml-source');
   const targetSelect = document.querySelector('#xml-target');
   const extractButton = document.querySelector('#xml-extract');
   const moveButton = document.querySelector('#xml-move');
   const resultElement = document.querySelector('#xml-result');
+  const statusElement = document.querySelector('#terminal-status');
 
   for (const terminal of TERMINALS) {
     sourceSelect.append(new Option(terminal, terminal));
@@ -30,25 +35,56 @@ export function initXmlOperations() {
   sourceSelect.value = 'A';
   targetSelect.value = 'D';
 
-  extractButton.addEventListener('click', async () => {
-    const document = await ensureXmlDocument(resultElement);
-    const terminal = sourceSelect.value;
-    const nodes = flightsByTerminal(document, terminal);
+  openButton.addEventListener('click', () => openTerminalDialog());
 
-    renderExtraction(resultElement, nodes, terminal);
+  closeButton.addEventListener('click', () => dialog.close());
+
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) {
+      dialog.close();
+    }
+  });
+
+  extractButton.addEventListener('click', async () => {
+    clearTerminalError(statusElement);
+
+    try {
+      const document = await ensureXmlDocument(resultElement);
+      const terminal = sourceSelect.value;
+
+      renderExtraction(resultElement, flightsByTerminal(document, terminal), terminal);
+    } catch (error) {
+      showTerminalError(statusElement, `Не удалось прочитать XML: ${error.message}`);
+    }
   });
 
   moveButton.addEventListener('click', async () => {
-    const document = await ensureXmlDocument(resultElement);
+    clearTerminalError(statusElement);
+
     const source = sourceSelect.value;
     const target = targetSelect.value;
 
     if (source === target) {
-      resultElement.innerHTML = '<p class="empty-state">Исходный и целевой терминал совпадают.</p>';
+      showTerminalError(statusElement, 'Выберите разные терминалы');
+      return;
+    }
+
+    let document;
+
+    try {
+      document = await ensureXmlDocument(resultElement);
+    } catch (error) {
+      showTerminalError(statusElement, `Не удалось прочитать XML: ${error.message}`);
       return;
     }
 
     const nodes = flightsByTerminal(document, source);
+
+    if (nodes.length === 0) {
+      showTerminalError(statusElement, `В терминале ${source} рейсов нет`);
+      return;
+    }
+
     const changedIds = [];
 
     for (const node of nodes) {
@@ -65,20 +101,47 @@ export function initXmlOperations() {
       }
     }
 
-    if (changedIds.length > 0) {
-      const details = new Map(state.xmlDetails);
+    const details = new Map(state.xmlDetails);
 
-      for (const id of changedIds) {
-        const current = details.get(id) ?? { terminal: '', checkIn: '' };
-        details.set(id, { ...current, terminal: target });
-      }
-
-      setXmlDetails(details);
-      highlightFlights(changedIds);
+    for (const id of changedIds) {
+      const current = details.get(id) ?? { terminal: '', checkIn: '' };
+      details.set(id, { ...current, terminal: target });
     }
 
-    renderModification(resultElement, { source, target, count: nodes.length });
+    setXmlDetails(details);
+    highlightFlights(changedIds);
+
+    dialog.close();
+    setActionStatus(`Терминалы: ${source} → ${target}, рейсов — ${nodes.length}`);
   });
+
+  document.querySelector('#flights').addEventListener('click', (event) => {
+    const cell = event.target.closest('td[data-terminal]');
+
+    if (!cell) {
+      return;
+    }
+
+    openTerminalDialog(cell.dataset.terminal);
+  });
+}
+
+export function openTerminalDialog(terminal) {
+  const dialog = document.querySelector('#terminal-dialog');
+  const sourceSelect = document.querySelector('#xml-source');
+  const resultElement = document.querySelector('#xml-result');
+  const statusElement = document.querySelector('#terminal-status');
+
+  if (terminal && [...sourceSelect.options].some((option) => option.value === terminal)) {
+    sourceSelect.value = terminal;
+  }
+
+  clearTerminalError(statusElement);
+  resultElement.innerHTML = '<p class="empty-state">Выберите терминал и нажмите «Показать рейсы».</p>';
+
+  if (!dialog.open) {
+    dialog.showModal();
+  }
 }
 
 async function ensureXmlDocument(resultElement) {
@@ -156,29 +219,28 @@ function renderExtraction(container, nodes, terminal) {
     .join('');
 
   container.innerHTML = `
-    <div class="table-wrap">
-      <table class="flights-table">
-        <thead>
-          <tr>
-            <th scope="col">Рейс</th>
-            <th scope="col">Терминал</th>
-            <th scope="col">Стойки регистрации</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-    <p class="flights-summary">Извлечено из XML: ${nodes.length} рейсов в терминале ${escapeHtml(terminal)}</p>
+    <table class="flights-table">
+      <thead>
+        <tr>
+          <th scope="col">Рейс</th>
+          <th scope="col">Терминал</th>
+          <th scope="col">Регистрация</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p class="flights-summary">Извлечено: ${nodes.length} рейсов в терминале ${escapeHtml(terminal)}</p>
   `;
 }
 
-function renderModification(container, { source, target, count }) {
-  const note =
-    count === 0
-      ? `В терминале ${escapeHtml(source)} рейсов нет — изменения не внесены.`
-      : `Терминал изменён: ${escapeHtml(source)} → ${escapeHtml(target)}, рейсов — ${count}. Изменения подсвечены в таблице расписания.`;
+function showTerminalError(statusElement, text) {
+  statusElement.textContent = text;
+  statusElement.classList.add('form-status--error');
+}
 
-  container.innerHTML = `<p class="xml-result__note">${note}</p>`;
+function clearTerminalError(statusElement) {
+  statusElement.textContent = '';
+  statusElement.classList.remove('form-status--error');
 }
 
 function textOf(node, tagName) {
