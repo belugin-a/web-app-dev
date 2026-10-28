@@ -29,6 +29,30 @@
                 </div>
             </div>
 
+            <div class="filters">
+                <label class="field">
+                    <span class="field__label">Статус</span>
+                    <select id="filter-status">
+                        <option value="all">Все статусы</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span class="field__label">Город</span>
+                    <input id="filter-city" type="search" placeholder="Например: Москва" autocomplete="off">
+                </label>
+                <label class="field">
+                    <span class="field__label">Сортировка по времени</span>
+                    <select id="sort-time">
+                        <option value="none">Без сортировки</option>
+                        <option value="asc">По возрастанию</option>
+                        <option value="desc">По убыванию</option>
+                    </select>
+                </label>
+                <div class="filters__actions">
+                    <button type="button" id="reset-view" class="button button--secondary">Сбросить</button>
+                </div>
+            </div>
+
             <div id="flights" class="flights" aria-live="polite">
                 <p class="empty-state">Данные ещё не загружены.</p>
             </div>

@@ -153,6 +153,15 @@ setInterval(() => {
   const candidates = flights.filter((flight) => STATUS_FLOW[flight.status]);
 
   if (candidates.length === 0) {
+    for (const flight of flights) {
+      const seeded = seed.flights.find((item) => item.id === flight.id);
+
+      if (seeded) {
+        flight.status = seeded.status;
+      }
+    }
+
+    broadcast(snapshotMessage());
     return;
   }
 

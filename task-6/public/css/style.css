@@ -89,6 +89,38 @@ body {
     text-align: right;
 }
 
+.filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.filters__actions {
+    display: flex;
+    align-items: flex-end;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.field__label {
+    color: #52606d;
+    font-size: 13px;
+}
+
+.field select,
+.field input {
+    padding: 7px 8px;
+    border: 1px solid #bcccdc;
+    border-radius: 6px;
+    background: #ffffff;
+    font: inherit;
+}
+
 .button {
     padding: 8px 16px;
     border: 1px solid #2f6fed;

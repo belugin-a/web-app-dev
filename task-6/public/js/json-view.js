@@ -1,6 +1,15 @@
-import { setFlights } from './store.js';
+import { setFlights, setView } from './store.js';
 
 export const JSON_SOURCE = 'data/flights.json';
+
+const FLIGHT_STATUSES = [
+  'По расписанию',
+  'Регистрация',
+  'Посадка',
+  'Задержан',
+  'Вылетел',
+  'Отменён',
+];
 
 export async function loadFlightsFromJson() {
   const response = await fetch(JSON_SOURCE, { cache: 'no-store' });
@@ -18,4 +27,36 @@ export async function loadFlightsFromJson() {
   setFlights(data.flights);
 
   return data.flights.length;
+}
+
+export function initJsonOperations() {
+  const statusSelect = document.querySelector('#filter-status');
+  const cityInput = document.querySelector('#filter-city');
+  const sortSelect = document.querySelector('#sort-time');
+  const resetButton = document.querySelector('#reset-view');
+
+  for (const status of FLIGHT_STATUSES) {
+    statusSelect.append(new Option(status, status));
+  }
+
+  const applyView = () => {
+    setView({
+      status: statusSelect.value,
+      city: cityInput.value,
+      sort: sortSelect.value,
+    });
+  };
+
+  statusSelect.addEventListener('change', applyView);
+  cityInput.addEventListener('input', applyView);
+  sortSelect.addEventListener('change', applyView);
+
+  resetButton.addEventListener('click', () => {
+    statusSelect.value = 'all';
+    cityInput.value = '';
+    sortSelect.value = 'none';
+    applyView();
+  });
+
+  applyView();
 }

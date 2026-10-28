@@ -14,6 +14,11 @@ export const state = {
   totalCount: 0,
   loaded: false,
   xmlDetails: new Map(),
+  view: {
+    status: 'all',
+    city: '',
+    sort: 'none',
+  },
 };
 
 const highlightedIds = new Set();
@@ -41,6 +46,36 @@ export function setXmlDetails(details) {
   if (state.loaded) {
     renderFlights();
   }
+}
+
+export function setView(patch) {
+  state.view = { ...state.view, ...patch };
+
+  if (state.loaded) {
+    renderFlights();
+  }
+}
+
+export function getVisibleFlights() {
+  const { status, city, sort } = state.view;
+  const cityQuery = city.trim().toLowerCase();
+
+  const flights = state.flights.filter((flight) => {
+    const matchesStatus = status === 'all' || flight.status === status;
+    const matchesCity = cityQuery === '' || flight.city.toLowerCase().includes(cityQuery);
+
+    return matchesStatus && matchesCity;
+  });
+
+  if (sort === 'asc') {
+    return [...flights].sort((a, b) => a.time.localeCompare(b.time));
+  }
+
+  if (sort === 'desc') {
+    return [...flights].sort((a, b) => b.time.localeCompare(a.time));
+  }
+
+  return flights;
 }
 
 export function replaceFlights(flights) {
@@ -87,9 +122,19 @@ export function renderFlights() {
     return;
   }
 
+  const visibleFlights = getVisibleFlights();
+
+  if (visibleFlights.length === 0) {
+    container.innerHTML = `
+      <p class="empty-state">По выбранным условиям рейсов не найдено.</p>
+      <p class="flights-summary">Показано 0 из ${state.totalCount}${describeView()}</p>
+    `;
+    return;
+  }
+
   const showXmlDetails = state.xmlDetails.size > 0;
 
-  const rows = state.flights
+  const rows = visibleFlights
     .map((flight) => {
       const details = state.xmlDetails.get(flight.id);
 
@@ -125,12 +170,30 @@ export function renderFlights() {
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <p class="flights-summary">Показано ${state.flights.length} из ${state.totalCount}</p>
+    <p class="flights-summary">Показано ${visibleFlights.length} из ${state.totalCount}${describeView()}</p>
   `;
 }
 
 function statusModifier(status) {
   return STATUS_MODIFIERS[status] ?? 'unknown';
+}
+
+function describeView() {
+  const parts = [];
+
+  if (state.view.status !== 'all') {
+    parts.push(`статус «${state.view.status}»`);
+  }
+
+  if (state.view.city.trim() !== '') {
+    parts.push(`город содержит «${escapeHtml(state.view.city.trim())}»`);
+  }
+
+  if (state.view.sort !== 'none') {
+    parts.push(`сортировка по времени ${state.view.sort === 'asc' ? '↑' : '↓'}`);
+  }
+
+  return parts.length > 0 ? ` · ${parts.join(' · ')}` : '';
 }
 
 function highlight(flightId) {
