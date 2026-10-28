@@ -8,6 +8,7 @@ const STATUS_MODIFIERS = {
 };
 
 const HIGHLIGHT_DURATION = 2500;
+const ADDED_HIGHLIGHT_DURATION = 4000;
 
 export const state = {
   flights: [],
@@ -22,6 +23,7 @@ export const state = {
 };
 
 const highlightedIds = new Set();
+const addedIds = new Set();
 
 export function escapeHtml(value) {
   return String(value)
@@ -109,8 +111,9 @@ export function applyFlightUpdate(flight) {
   const index = state.flights.findIndex((item) => item.id === flight.id);
 
   if (index === -1) {
-    state.flights.push(flight);
+    state.flights.unshift(flight);
     state.totalCount = state.flights.length;
+    markAdded(flight.id);
   } else {
     if (state.flights[index].status !== flight.status) {
       highlight(flight.id);
@@ -149,7 +152,12 @@ export function renderFlights() {
       const details = state.xmlDetails.get(flight.id);
 
       return `
-        <tr data-flight-id="${escapeHtml(flight.id)}" class="${highlightedIds.has(flight.id) ? 'row--changed' : ''}">
+        <tr data-flight-id="${escapeHtml(flight.id)}" class="${[
+          highlightedIds.has(flight.id) ? 'row--changed' : '',
+          addedIds.has(flight.id) ? 'row--added' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}">
           <td class="flight-number">${escapeHtml(flight.number)}</td>
           <td>${escapeHtml(flight.airline)}</td>
           <td>${escapeHtml(flight.city)}</td>
@@ -215,4 +223,15 @@ function highlight(flightId) {
       .querySelector(`[data-flight-id="${CSS.escape(flightId)}"]`)
       ?.classList.remove('row--changed');
   }, HIGHLIGHT_DURATION);
+}
+
+function markAdded(flightId) {
+  addedIds.add(flightId);
+
+  setTimeout(() => {
+    addedIds.delete(flightId);
+    document
+      .querySelector(`[data-flight-id="${CSS.escape(flightId)}"]`)
+      ?.classList.remove('row--added');
+  }, ADDED_HIGHLIGHT_DURATION);
 }

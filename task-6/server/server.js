@@ -16,6 +16,7 @@ const app = express();
 const server = createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
 
+app.use(express.json({ limit: '10kb' }));
 app.use(express.static(path.join(projectRoot, 'public')));
 app.use('/data', express.static(path.join(projectRoot, 'data')));
 
@@ -95,6 +96,82 @@ setInterval(() => {
     client.write(': keep-alive\n\n');
   }
 }, 15000).unref();
+
+const FIELD_LIMITS = {
+  airline: 60,
+  city: 60,
+  gate: 6,
+};
+
+function validateFlight(body) {
+  const number = String(body.number ?? '').trim().toUpperCase();
+
+  if (!/^[A-ZА-Я0-9][A-ZА-Я0-9 -]{1,9}$/u.test(number)) {
+    return { error: 'Номер рейса: 2–10 символов — буквы, цифры, пробел или дефис' };
+  }
+
+  const airline = String(body.airline ?? '').trim();
+
+  if (airline.length < 2 || airline.length > FIELD_LIMITS.airline) {
+    return { error: 'Авиакомпания: от 2 до 60 символов' };
+  }
+
+  const city = String(body.city ?? '').trim();
+
+  if (city.length < 2 || city.length > FIELD_LIMITS.city) {
+    return { error: 'Город: от 2 до 60 символов' };
+  }
+
+  const time = String(body.time ?? '').trim();
+
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) {
+    return { error: 'Время: формат ЧЧ:ММ' };
+  }
+
+  const gate = String(body.gate ?? '').trim().toUpperCase();
+
+  if (!/^[A-ZА-Я0-9-]{1,6}$/u.test(gate)) {
+    return { error: 'Выход: до 6 символов — буквы, цифры или дефис' };
+  }
+
+  return {
+    flight: {
+      number,
+      airline,
+      city,
+      time,
+      gate,
+    },
+  };
+}
+
+app.post('/api/flights', (request, response) => {
+  const validation = validateFlight(request.body ?? {});
+
+  if (validation.error) {
+    response.status(400).json({ error: validation.error });
+    return;
+  }
+
+  const { flight } = validation;
+  const id = flight.number.replaceAll(' ', '-');
+
+  if (flights.some((item) => item.id === id)) {
+    response.status(409).json({ error: 'Рейс с таким номером уже есть в расписании' });
+    return;
+  }
+
+  const created = {
+    id,
+    ...flight,
+    status: 'По расписанию',
+  };
+
+  flights.unshift(created);
+  broadcast({ type: 'flight-added', flight: created });
+
+  response.status(201).json({ flight: created });
+});
 
 const STATUS_FLOW = {
   'По расписанию': 'Регистрация',

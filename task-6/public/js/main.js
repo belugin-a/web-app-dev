@@ -1,3 +1,4 @@
+import { initFlightForm } from './form-view.js';
 import { initJsonOperations, JSON_SOURCE, loadFlightsFromJson } from './json-view.js';
 import { initLiveUpdates, initSseFeed, requestSnapshot } from './live.js';
 import { escapeHtml, state } from './store.js';
@@ -13,6 +14,7 @@ initLiveUpdates();
 initSseFeed();
 initJsonOperations();
 initXmlOperations();
+initFlightForm();
 
 loadButton.addEventListener('click', async () => {
   const buttonText = loadButton.textContent;

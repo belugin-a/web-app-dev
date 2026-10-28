@@ -52,11 +52,16 @@ export function initJsonOperations() {
   sortSelect.addEventListener('change', applyView);
 
   resetButton.addEventListener('click', () => {
-    statusSelect.value = 'all';
-    cityInput.value = '';
-    sortSelect.value = 'none';
-    applyView();
+    resetJsonView();
   });
 
   applyView();
+}
+
+export function resetJsonView() {
+  document.querySelector('#filter-status').value = 'all';
+  document.querySelector('#filter-city').value = '';
+  document.querySelector('#sort-time').value = 'none';
+
+  setView({ status: 'all', city: '', sort: 'none' });
 }

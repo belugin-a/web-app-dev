@@ -16,7 +16,10 @@
 
         <section class="panel">
             <div class="panel-header">
-                <h2>Расписание рейсов</h2>
+                <div class="panel-heading">
+                    <h2>Расписание рейсов</h2>
+                    <button type="button" id="open-flight-dialog" class="button button--icon" aria-label="Добавить рейс" title="Добавить рейс">+</button>
+                </div>
                 <div class="load-controls">
                     <div class="load-control">
                         <button type="button" id="load-data" class="button">Загрузить данные из JSON-файла</button>
@@ -28,6 +31,8 @@
                     </div>
                 </div>
             </div>
+
+            <p id="flight-status" class="flight-status" role="status"></p>
 
             <div class="filters">
                 <label class="field">
@@ -115,7 +120,45 @@
                 <li class="log__empty">Ожидание сводок погоды…</li>
             </ul>
         </section>
+
     </main>
+
+    <dialog id="add-flight-dialog" class="dialog" aria-labelledby="add-flight-title">
+        <div class="dialog__header">
+            <h2 id="add-flight-title">Добавить рейс</h2>
+            <button type="button" id="close-flight-dialog" class="button button--icon button--secondary" aria-label="Закрыть">×</button>
+        </div>
+
+        <form id="flight-form" class="flight-form">
+            <label class="field">
+                <span class="field__label">Номер рейса</span>
+                <input name="number" required maxlength="10" placeholder="Например: SU 1234" autocomplete="off">
+            </label>
+            <label class="field">
+                <span class="field__label">Авиакомпания</span>
+                <input name="airline" required maxlength="60" placeholder="Например: Аэрофлот" autocomplete="off">
+            </label>
+            <label class="field">
+                <span class="field__label">Город</span>
+                <input name="city" required maxlength="60" placeholder="Например: Москва" autocomplete="off">
+            </label>
+            <label class="field">
+                <span class="field__label">Время</span>
+                <input name="time" type="time" required>
+            </label>
+            <label class="field">
+                <span class="field__label">Выход</span>
+                <input name="gate" required maxlength="6" placeholder="Например: A12" autocomplete="off">
+            </label>
+
+            <div class="dialog__actions">
+                <button type="button" id="cancel-flight-form" class="button button--secondary">Отмена</button>
+                <button type="submit" class="button">Добавить рейс</button>
+            </div>
+        </form>
+
+        <p id="form-status" class="form-status" role="status"></p>
+    </dialog>
 
     <script type="module" src="js/main.js"></script>
 </body>

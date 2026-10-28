@@ -105,6 +105,12 @@ function handleMessage(rawMessage) {
     return;
   }
 
+  if (message.type === 'flight-added') {
+    applyFlightUpdate(message.flight);
+    addLog(`Добавлен рейс ${message.flight.number} (${message.flight.city})`);
+    return;
+  }
+
   if (message.type === 'pong') {
     addLog('Получен pong — канал работает в обе стороны');
   }
