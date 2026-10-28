@@ -60,6 +60,33 @@
 
         <section class="panel">
             <div class="panel-header">
+                <h2>XML: извлечение и изменение</h2>
+            </div>
+
+            <div class="xml-actions">
+                <div class="xml-group">
+                    <label class="field">
+                        <span class="field__label">Терминал</span>
+                        <select id="xml-source"></select>
+                    </label>
+                    <button type="button" id="xml-extract" class="button button--secondary">Извлечь рейсы</button>
+                </div>
+                <div class="xml-group">
+                    <label class="field">
+                        <span class="field__label">Перевести в терминал</span>
+                        <select id="xml-target"></select>
+                    </label>
+                    <button type="button" id="xml-move" class="button">Сменить терминал</button>
+                </div>
+            </div>
+
+            <div id="xml-result">
+                <p class="empty-state">Загрузите XML и выполните операцию.</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
                 <h2>WebSocket: обновления в реальном времени</h2>
                 <div class="live-actions">
                     <span id="ws-status" class="connection connection--connecting">

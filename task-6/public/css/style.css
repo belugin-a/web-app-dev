@@ -121,6 +121,27 @@ body {
     font: inherit;
 }
 
+.xml-result__note {
+    margin: 0 0 10px;
+}
+
+.xml-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    margin-bottom: 16px;
+}
+
+.xml-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.xml-group .field {
+    min-width: 170px;
+}
+
 .button {
     padding: 8px 16px;
     border: 1px solid #2f6fed;

@@ -95,6 +95,16 @@ export function replaceFlights(flights) {
   }
 }
 
+export function highlightFlights(ids) {
+  for (const id of ids) {
+    highlight(id);
+  }
+
+  if (state.loaded) {
+    renderFlights();
+  }
+}
+
 export function applyFlightUpdate(flight) {
   const index = state.flights.findIndex((item) => item.id === flight.id);
 
