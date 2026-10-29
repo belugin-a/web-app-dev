@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { config } from './config.js';
+import { dbState } from './db.js';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(rootDir, 'public');
@@ -25,11 +26,14 @@ app.use(express.json({ limit: '100kb' }));
 // Звено 1: статика клиентской части.
 app.use(express.static(publicDir));
 
-// Проверка живости сервера. На шаге 2 сюда добавится состояние MongoDB.
+// Проверка живости сервера и состояния подключения к MongoDB.
 app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
+  const db = dbState();
+
+  res.status(db === 'connected' ? 200 : 503).json({
+    status: db === 'connected' ? 'ok' : 'degraded',
     app: config.appName,
+    db,
     uptime: Math.round(process.uptime()),
     time: new Date().toISOString(),
   });
