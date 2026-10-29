@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Аналитика авиаперелётов — ПР7</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="topbar__title">
+        <h1>Аналитика авиаперелётов</h1>
+        <div class="topbar__meta">
+          <p class="topbar__subtitle">Практическая работа №7 · Chart.js + SortableJS</p>
+          <button type="button" class="link-btn" id="open-data" aria-haspopup="dialog">Данные для анализа</button>
+        </div>
+      </div>
+
+      <form class="filters" id="filters" autocomplete="off">
+        <label class="field">
+          <span class="field__label">Авиакомпания</span>
+          <select id="airline-filter">
+            <option value="all">Все авиакомпании</option>
+            <option value="Аэрофлот">Аэрофлот</option>
+            <option value="S7 Airlines">S7 Airlines</option>
+            <option value="Уральские авиалинии">Уральские авиалинии</option>
+            <option value="Победа">Победа</option>
+            <option value="Россия">Россия</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Период</span>
+          <select id="period-filter">
+            <option value="all">Весь год</option>
+            <option value="q1">1 квартал</option>
+            <option value="q2">2 квартал</option>
+            <option value="q3">3 квартал</option>
+            <option value="q4">4 квартал</option>
+            <option value="h1">1 полугодие</option>
+            <option value="h2">2 полугодие</option>
+          </select>
+        </label>
+
+        <button type="button" class="btn" id="reset-layout">Сбросить раскладку</button>
+      </form>
+    </header>
+
+    <section class="kpi" aria-label="Ключевые показатели">
+      <div class="kpi__item">
+        <span class="kpi__value" data-kpi="flights">—</span>
+        <span class="kpi__label">рейсов</span>
+      </div>
+      <div class="kpi__item">
+        <span class="kpi__value" data-kpi="passengers">—</span>
+        <span class="kpi__label">пассажиров</span>
+      </div>
+      <div class="kpi__item">
+        <span class="kpi__value" data-kpi="delay">—</span>
+        <span class="kpi__label">средняя задержка</span>
+      </div>
+    </section>
+
+    <main class="dashboard" id="dashboard">
+      <section class="card" data-id="flights">
+        <header class="card__head">
+          <button type="button" class="card__handle" aria-label="Перетащить карточку" title="Перетащить">⋮⋮</button>
+          <h2 class="card__title">Рейсы по месяцам</h2>
+          <div class="card__tools">
+            <button type="button" class="btn btn--sm" data-action="toggle-type">Линия</button>
+            <button type="button" class="btn btn--sm" data-action="export">PNG</button>
+          </div>
+        </header>
+        <div class="card__body">
+          <canvas id="chart-flights" role="img" aria-label="Столбчатая диаграмма количества рейсов по месяцам"></canvas>
+        </div>
+      </section>
+
+      <section class="card" data-id="passengers">
+        <header class="card__head">
+          <button type="button" class="card__handle" aria-label="Перетащить карточку" title="Перетащить">⋮⋮</button>
+          <h2 class="card__title">Пассажиропоток</h2>
+          <div class="card__tools">
+            <button type="button" class="btn btn--sm" data-action="export">PNG</button>
+          </div>
+        </header>
+        <div class="card__body">
+          <canvas id="chart-passengers" role="img" aria-label="Линейный график пассажиропотока по месяцам"></canvas>
+        </div>
+      </section>
+
+      <section class="card" data-id="airlines">
+        <header class="card__head">
+          <button type="button" class="card__handle" aria-label="Перетащить карточку" title="Перетащить">⋮⋮</button>
+          <h2 class="card__title">Доли авиакомпаний</h2>
+          <div class="card__tools">
+            <button type="button" class="btn btn--sm" data-action="export">PNG</button>
+          </div>
+        </header>
+        <div class="card__body">
+          <canvas id="chart-airlines" role="img" aria-label="Кольцевая диаграмма долей авиакомпаний"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <p class="hint">
+      Перетащите карточку за ручку ⋮⋮, чтобы поменять графики местами: первая карточка занимает всю ширину.
+      Раскладка сохраняется в браузере.
+    </p>
+  </div>
+
+  <dialog class="modal" id="data-dialog" aria-labelledby="data-dialog-title">
+    <div class="modal__head">
+      <div>
+        <h2 class="modal__title" id="data-dialog-title">Данные для анализа</h2>
+        <p class="modal__subtitle" id="data-dialog-subtitle">Сырые записи без агрегации</p>
+      </div>
+      <button type="button" class="modal__close" id="close-data" aria-label="Закрыть таблицу">×</button>
+    </div>
+    <div class="modal__body">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Дата</th>
+            <th scope="col">Авиакомпания</th>
+            <th scope="col" class="data-table__num">Пассажиры</th>
+            <th scope="col" class="data-table__num">Задержка, мин</th>
+          </tr>
+        </thead>
+        <tbody id="data-rows"></tbody>
+      </table>
+    </div>
+    <div class="modal__foot">Источник: <code>js/data.js</code> · синтетические данные для демонстрации</div>
+  </dialog>
+
+  <script src="vendor/chart.umd.js" defer></script>
+  <script src="vendor/sortable.min.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/aggregate.js" defer></script>
+  <script src="js/charts.js" defer></script>
+  <script src="js/layout.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
