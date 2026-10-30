@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import { config } from './config.js';
 import { dbState } from './db.js';
+import { authRouter } from './routes/auth.js';
+import { usersRouter } from './routes/users.js';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(rootDir, 'public');
@@ -39,6 +41,10 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Звено 2: API.
+app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
+
 // Неизвестный API-маршрут: отвечаем JSON, а не HTML-страницей Express.
 app.use('/api', (req, res) => {
   res.status(404).json({ error: 'Маршрут не найден' });
@@ -49,6 +55,40 @@ app.use((req, res) => {
   res.status(404).type('text').send('404 — страница не найдена');
 });
 
+/** Переводит ошибки Express и Mongoose в пару «статус + текст». */
+function describeError(err) {
+  if (err.type === 'entity.parse.failed') {
+    return [400, 'Некорректный JSON в теле запроса'];
+  }
+
+  // Нарушение уникального индекса.
+  if (err.code === 11000) {
+    const field = Object.keys(err.keyPattern ?? {})[0];
+    return [
+      409,
+      field === 'email'
+        ? 'Пользователь с таким e-mail уже существует'
+        : 'Запись с такими данными уже существует',
+    ];
+  }
+
+  // Ошибки валидации схемы Mongoose.
+  if (err.name === 'ValidationError') {
+    const first = Object.values(err.errors ?? {})[0];
+    return [400, first?.message ?? 'Некорректные данные'];
+  }
+
+  if (err.name === 'CastError') {
+    return [400, 'Некорректный идентификатор'];
+  }
+
+  if (err.status) {
+    return [err.status, err.message];
+  }
+
+  return [500, 'Внутренняя ошибка сервера'];
+}
+
 // Централизованный обработчик ошибок. В Express 5 сюда попадают
 // и ошибки синхронных обработчиков, и отклонённые промисы из async-функций.
 app.use((err, req, res, next) => {
@@ -56,14 +96,7 @@ app.use((err, req, res, next) => {
     return next(err);
   }
 
-  const isBadJson = err.type === 'entity.parse.failed';
-
-  const status = isBadJson ? 400 : err.status || err.statusCode || 500;
-  const message = isBadJson
-    ? 'Некорректный JSON в теле запроса'
-    : status === 500
-      ? 'Внутренняя ошибка сервера'
-      : err.message || 'Ошибка запроса';
+  const [status, message] = describeError(err);
 
   if (status === 500) {
     console.error(err);
