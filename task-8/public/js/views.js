@@ -162,6 +162,22 @@ export function editTemplate({ user }) {
       </div>
 
       <section class="card">
+        <h2>Аватар</h2>
+        <div class="avatar-editor">
+          ${avatarHtml(user, 'lg')}
+          <form id="avatar-form" class="form">
+            <label class="field">
+              <span class="field__label">Новый аватар</span>
+              <input name="avatar" type="file" accept="image/png,image/jpeg,image/webp" required />
+            </label>
+            <p class="hint">PNG, JPEG или WebP, не больше 2 МБ.</p>
+            <p class="form__error" hidden></p>
+            <button class="btn" type="submit">Загрузить аватар</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
         <form id="edit-form" class="form">
           <div class="form__row">
             <label class="field">

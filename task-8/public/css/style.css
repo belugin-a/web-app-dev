@@ -288,6 +288,36 @@ a {
   border-radius: 9px;
 }
 
+.avatar-editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.avatar-editor .form {
+  flex: 1;
+  min-width: 240px;
+}
+
+.field input[type="file"] {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.field input[type="file"]::file-selector-button {
+  padding: 5px 10px;
+  margin-right: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
 .hint {
   margin: 12px 0 0;
   font-size: 13px;

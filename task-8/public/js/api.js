@@ -1,4 +1,5 @@
 const REQUEST_TIMEOUT_MS = 15000;
+const UPLOAD_TIMEOUT_MS = 30000;
 
 export class ApiError extends Error {
   constructor(message, status = 0) {
@@ -6,6 +7,21 @@ export class ApiError extends Error {
     this.name = 'ApiError';
     this.status = status;
   }
+}
+
+/** Разбирает ответ: 204 — пусто, иначе JSON; ошибки превращает в ApiError. */
+async function readResponse(response) {
+  if (response.status === 204) {
+    return null;
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new ApiError(data.error || `Ошибка ${response.status}`, response.status);
+  }
+
+  return data;
 }
 
 /**
@@ -33,17 +49,7 @@ async function request(method, url, body) {
     throw new ApiError('Сервер не отвечает. Проверьте, что он запущен.', 0);
   }
 
-  if (response.status === 204) {
-    return null;
-  }
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new ApiError(data.error || `Ошибка ${response.status}`, response.status);
-  }
-
-  return data;
+  return readResponse(response);
 }
 
 export const api = {
@@ -55,4 +61,25 @@ export const api = {
   getUser: (id) => request('GET', `/api/users/${encodeURIComponent(id)}`),
   updateUser: (id, patch) => request('PATCH', `/api/users/${encodeURIComponent(id)}`, patch),
   deleteUser: (id) => request('DELETE', `/api/users/${encodeURIComponent(id)}`),
+
+  /** multipart/form-data: Content-Type выставляет сам браузер вместе с boundary. */
+  async uploadAvatar(id, file) {
+    const body = new FormData();
+    body.append('avatar', file);
+
+    let response;
+
+    try {
+      response = await fetch(`/api/users/${encodeURIComponent(id)}/avatar`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        body,
+        signal: AbortSignal.timeout(UPLOAD_TIMEOUT_MS),
+      });
+    } catch {
+      throw new ApiError('Сервер не отвечает. Проверьте, что он запущен.', 0);
+    }
+
+    return readResponse(response);
+  },
 };

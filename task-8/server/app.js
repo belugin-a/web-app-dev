@@ -6,6 +6,7 @@ import { config } from './config.js';
 import { dbState } from './db.js';
 import { authRouter } from './routes/auth.js';
 import { usersRouter } from './routes/users.js';
+import { uploadsDir } from './storage.js';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(rootDir, 'public');
@@ -27,6 +28,9 @@ app.use(express.json({ limit: '100kb' }));
 
 // Звено 1: статика клиентской части.
 app.use(express.static(publicDir));
+
+// Загруженные аватары. Имена файлов уникальные, поэтому кэш можно держать долго.
+app.use('/uploads', express.static(uploadsDir, { maxAge: '7d', immutable: true }));
 
 // Проверка живости сервера и состояния подключения к MongoDB.
 app.get('/api/health', (req, res) => {
@@ -76,6 +80,15 @@ function describeError(err) {
   if (err.name === 'ValidationError') {
     const first = Object.values(err.errors ?? {})[0];
     return [400, first?.message ?? 'Некорректные данные'];
+  }
+
+  if (err.name === 'MulterError') {
+    return [
+      400,
+      err.code === 'LIMIT_FILE_SIZE'
+        ? 'Файл больше 2 МБ'
+        : 'Не удалось загрузить файл',
+    ];
   }
 
   if (err.name === 'CastError') {

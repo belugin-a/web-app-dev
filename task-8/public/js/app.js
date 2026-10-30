@@ -152,12 +152,17 @@ async function renderEdit(id, token) {
     const { user } = await api.getUser(id);
     if (token !== renderId) return;
 
-    appEl.innerHTML = editTemplate({ user });
-    bindEditForm(user);
+    renderEditView(user);
   } catch (err) {
     if (token !== renderId) return;
     appEl.innerHTML = notFoundTemplate(err.message);
   }
+}
+
+function renderEditView(user) {
+  appEl.innerHTML = editTemplate({ user });
+  bindAvatarForm(user);
+  bindEditForm(user);
 }
 
 function renderProfileView(user) {
@@ -199,6 +204,40 @@ function bindAuth() {
       session = setSession(user);
       toast(authMode === 'register' ? 'Аккаунт создан' : 'Вы вошли');
       navigate(`#/u/${user._id}`);
+    } catch (err) {
+      showFormError(form, err.message);
+      setFormBusy(form, false);
+    }
+  });
+}
+
+function bindAvatarForm(user) {
+  const form = document.getElementById('avatar-form');
+  if (!form) return;
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    clearFormError(form);
+
+    const file = form.elements.avatar.files?.[0];
+
+    if (!file) {
+      showFormError(form, 'Выберите файл');
+      return;
+    }
+
+    setFormBusy(form, true);
+
+    try {
+      const { user: updated } = await api.uploadAvatar(user._id, file);
+
+      if (session?.id === updated._id) {
+        session = setSession(updated);
+        renderHeader();
+      }
+
+      toast('Аватар обновлён');
+      renderEditView(updated);
     } catch (err) {
       showFormError(form, err.message);
       setFormBusy(form, false);
