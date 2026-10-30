@@ -151,6 +151,10 @@ a {
   gap: 10px;
 }
 
+.lead + .actions {
+  margin-top: 18px;
+}
+
 /* Карточки */
 
 .card {

@@ -1,27 +1,11 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 
-import { config } from '../config.js';
+import { clearAuthCookie, setAuthCookie } from '../middleware/auth.js';
 import { User } from '../models/User.js';
 import { badRequest, httpError } from '../utils/errors.js';
 
-export const AUTH_COOKIE = 'token';
-const TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const BCRYPT_ROUNDS = 10;
-
-/** Кладёт JWT в httpOnly-cookie: JS на клиенте токен прочитать не может. */
-function setAuthCookie(res, userId) {
-  const token = jwt.sign({ sub: userId }, config.jwtSecret, { expiresIn: '7d' });
-
-  res.cookie(AUTH_COOKIE, token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: config.isProduction,
-    maxAge: TOKEN_TTL_MS,
-    path: '/',
-  });
-}
 
 function normalizeEmail(value) {
   return typeof value === 'string' ? value.trim().toLowerCase() : '';
@@ -88,11 +72,6 @@ authRouter.post('/login', async (req, res) => {
 
 // POST /api/auth/logout — удаление cookie. Работает и без авторизации.
 authRouter.post('/logout', (req, res) => {
-  res.clearCookie(AUTH_COOKIE, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: config.isProduction,
-    path: '/',
-  });
+  clearAuthCookie(res);
   res.status(204).end();
 });

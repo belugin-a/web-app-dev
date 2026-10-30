@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import { requireAuth, requireSelf } from '../middleware/auth.js';
 import { uploadAvatar } from '../middleware/upload.js';
 import { User } from '../models/User.js';
 import { removeAvatar } from '../storage.js';
@@ -16,6 +17,26 @@ function assertUuid(id) {
   if (!UUID_RE.test(id)) {
     throw badRequest('Идентификатор профиля должен быть UUID');
   }
+}
+
+function assertIdParam(req, res, next) {
+  try {
+    assertUuid(req.params.id);
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+/** Публичное представление чужого профиля: без e-mail и служебных полей. */
+function publicProfile(user) {
+  return {
+    _id: user._id,
+    name: user.name,
+    about: user.about,
+    avatar: user.avatar,
+    createdAt: user.createdAt,
+  };
 }
 
 /** Собирает патч только из разрешённых полей. */
@@ -37,14 +58,25 @@ function pickEditableFields(body) {
 
 export const usersRouter = Router();
 
-// GET /api/users — список профилей для навигации.
+// GET /api/users — список профилей. Открыт всем, поэтому без e-mail.
 usersRouter.get('/', async (req, res) => {
-  const users = await User.find().sort({ createdAt: -1 }).limit(100);
+  const users = await User.find()
+    .select('name about avatar createdAt')
+    .sort({ createdAt: -1 })
+    .limit(100);
+
   res.json({ users });
 });
 
-// GET /api/users/:id — профиль по UUID.
-usersRouter.get('/:id', async (req, res) => {
+// GET /api/users/me — свой профиль целиком. Объявлен до /:id,
+// иначе Express примет «me» за UUID.
+usersRouter.get('/me', requireAuth, (req, res) => {
+  res.json({ user: req.user });
+});
+
+// GET /api/users/:id — профиль по UUID. Только для вошедших:
+// свой — целиком, чужой — без e-mail.
+usersRouter.get('/:id', requireAuth, async (req, res) => {
   assertUuid(req.params.id);
 
   const user = await User.findById(req.params.id);
@@ -52,13 +84,12 @@ usersRouter.get('/:id', async (req, res) => {
     throw notFound('Профиль не найден');
   }
 
-  res.json({ user });
+  const isSelf = req.user._id === user._id;
+  res.json({ user: isSelf ? user : publicProfile(user) });
 });
 
-// PATCH /api/users/:id — обновление профиля.
-usersRouter.patch('/:id', async (req, res) => {
-  assertUuid(req.params.id);
-
+// PATCH /api/users/:id — обновление только своего профиля.
+usersRouter.patch('/:id', requireAuth, assertIdParam, requireSelf(), async (req, res) => {
   const patch = pickEditableFields(req.body ?? {});
 
   const user = await User.findByIdAndUpdate(req.params.id, patch, {
@@ -73,10 +104,8 @@ usersRouter.patch('/:id', async (req, res) => {
   res.json({ user });
 });
 
-// DELETE /api/users/:id — удаление профиля.
-usersRouter.delete('/:id', async (req, res) => {
-  assertUuid(req.params.id);
-
+// DELETE /api/users/:id — удаление только своего профиля.
+usersRouter.delete('/:id', requireAuth, assertIdParam, requireSelf(), async (req, res) => {
   const user = await User.findByIdAndDelete(req.params.id);
   if (!user) {
     throw notFound('Профиль не найден');
@@ -86,18 +115,12 @@ usersRouter.delete('/:id', async (req, res) => {
   res.status(204).end();
 });
 
-// POST /api/users/:id/avatar — загрузка аватара (multipart/form-data, поле avatar).
-// Проверку UUID делаем до multer, чтобы не писать файл на диск зря.
+// POST /api/users/:id/avatar — загрузка аватара только в свой профиль.
 usersRouter.post(
   '/:id/avatar',
-  (req, res, next) => {
-    try {
-      assertUuid(req.params.id);
-      next();
-    } catch (err) {
-      next(err);
-    }
-  },
+  requireAuth,
+  assertIdParam,
+  requireSelf(),
   uploadAvatar,
   async (req, res) => {
     if (!req.file) {

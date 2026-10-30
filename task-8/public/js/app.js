@@ -4,8 +4,10 @@ import { clearFormError, setFormBusy, showFormError, toast } from './ui.js';
 import {
   editTemplate,
   errorTemplate,
+  forbiddenTemplate,
   homeTemplate,
   loadingTemplate,
+  loginRequiredTemplate,
   notFoundTemplate,
   profileTemplate,
   usersTemplate,
@@ -33,6 +35,7 @@ let authMode = 'login';
 let users = [];
 let renderId = 0;
 let userToDelete = null;
+let returnTo = null;
 
 function routeFromHash() {
   const hash = location.hash.replace(/^#/, '') || '/';
@@ -141,6 +144,13 @@ async function renderProfile(id, token) {
     renderProfileView(user);
   } catch (err) {
     if (token !== renderId) return;
+
+    if (err.status === 401) {
+      returnTo = `#/u/${id}`;
+      appEl.innerHTML = loginRequiredTemplate();
+      return;
+    }
+
     appEl.innerHTML = notFoundTemplate(err.message);
   }
 }
@@ -155,11 +165,29 @@ async function renderEdit(id, token) {
     renderEditView(user);
   } catch (err) {
     if (token !== renderId) return;
+
+    if (err.status === 401) {
+      returnTo = `#/u/${id}/edit`;
+      appEl.innerHTML = loginRequiredTemplate();
+      return;
+    }
+
+    if (err.status === 403) {
+      appEl.innerHTML = forbiddenTemplate(err.message);
+      return;
+    }
+
     appEl.innerHTML = notFoundTemplate(err.message);
   }
 }
 
 function renderEditView(user) {
+  // Сервер всё равно вернёт 403, но чужую форму редактирования показывать незачем.
+  if (!session || session.id !== user._id) {
+    appEl.innerHTML = forbiddenTemplate('Можно изменять только свой профиль');
+    return;
+  }
+
   appEl.innerHTML = editTemplate({ user });
   bindAvatarForm(user);
   bindEditForm(user);
@@ -203,7 +231,10 @@ function bindAuth() {
 
       session = setSession(user);
       toast(authMode === 'register' ? 'Аккаунт создан' : 'Вы вошли');
-      navigate(`#/u/${user._id}`);
+
+      const target = returnTo;
+      returnTo = null;
+      navigate(target ?? `#/u/${user._id}`);
     } catch (err) {
       showFormError(form, err.message);
       setFormBusy(form, false);
@@ -321,14 +352,29 @@ headerEl.addEventListener('click', async (event) => {
   }
 
   session = clearSession();
+  returnTo = null;
   toast('Вы вышли из аккаунта');
   navigate('#/');
 });
 
 window.addEventListener('hashchange', render);
 
+/** При старте проверяем сессию на сервере: localStorage — только подсказка. */
+async function init() {
+  appEl.innerHTML = loadingTemplate();
+
+  try {
+    const { user } = await api.me();
+    session = setSession(user);
+  } catch {
+    session = clearSession();
+  }
+
+  render();
+}
+
 if (!location.hash) {
   history.replaceState(null, '', '#/');
 }
 
-render();
+init();

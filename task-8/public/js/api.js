@@ -58,6 +58,7 @@ export const api = {
   logout: () => request('POST', '/api/auth/logout'),
 
   listUsers: () => request('GET', '/api/users'),
+  me: () => request('GET', '/api/users/me'),
   getUser: (id) => request('GET', `/api/users/${encodeURIComponent(id)}`),
   updateUser: (id, patch) => request('PATCH', `/api/users/${encodeURIComponent(id)}`, patch),
   deleteUser: (id) => request('DELETE', `/api/users/${encodeURIComponent(id)}`),

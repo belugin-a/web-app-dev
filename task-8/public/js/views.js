@@ -145,10 +145,11 @@ export function profileTemplate({ user, session, isSelf }) {
       <dl class="facts">${factsHtml}</dl>
     </section>
 
-    <div class="profile-actions">
-      <a class="btn btn--primary" href="#/u/${encodeURIComponent(user._id)}/edit">Изменить</a>
-      <button class="btn btn--danger" type="button" data-action="delete">Удалить</button>
-    </div>
+    ${isSelf ? `
+      <div class="profile-actions">
+        <a class="btn btn--primary" href="#/u/${encodeURIComponent(user._id)}/edit">Изменить</a>
+        <button class="btn btn--danger" type="button" data-action="delete">Удалить</button>
+      </div>` : ''}
   `;
 }
 
@@ -214,6 +215,33 @@ export function notFoundTemplate(message) {
     <a class="back" href="#/users">← Все профили</a>
     <section class="card">
       <h1>Профиль недоступен</h1>
+      <p class="lead">${escapeHtml(message)}</p>
+      <a class="btn btn--primary" href="#/">На главную</a>
+    </section>
+  `;
+}
+
+export function loginRequiredTemplate() {
+  return `
+    <a class="back" href="#/users">← Все профили</a>
+    <section class="card">
+      <h1>Нужно войти</h1>
+      <p class="lead">
+        Список пользователей открыт всем, а профили видны только после входа в аккаунт.
+      </p>
+      <div class="actions">
+        <a class="btn btn--primary" href="#/login">Войти</a>
+        <a class="btn" href="#/register">Зарегистрироваться</a>
+      </div>
+    </section>
+  `;
+}
+
+export function forbiddenTemplate(message) {
+  return `
+    <a class="back" href="#/users">← Все профили</a>
+    <section class="card">
+      <h1>Нет доступа</h1>
       <p class="lead">${escapeHtml(message)}</p>
       <a class="btn btn--primary" href="#/">На главную</a>
     </section>
