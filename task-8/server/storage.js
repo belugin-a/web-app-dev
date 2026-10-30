@@ -2,12 +2,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { unlink } from 'node:fs/promises';
 
-/** Папка с загруженными файлами: task-8/uploads. */
-export const uploadsDir = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..',
-  'uploads',
-);
+/** Папка с загруженными файлами: task-8/uploads (в тестах — временная). */
+export const uploadsDir = process.env.UPLOADS_DIR
+  ? path.resolve(process.env.UPLOADS_DIR)
+  : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'uploads');
 
 /**
  * Удаляет файл аватара. Отсутствие файла — не ошибка:
