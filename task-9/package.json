@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Практическая работа №9: трёхзвенное серверное приложение на Node.js (Express + SQLite)",
   "engines": {
-    "node": ">=22.5.0"
+    "node": ">=23.5.0"
   },
   "scripts": {
     "start": "node server/server.js",
