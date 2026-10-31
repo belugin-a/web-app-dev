@@ -1,0 +1,20 @@
+{
+  "name": "task-9-support-tickets",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Практическая работа №9: трёхзвенное серверное приложение на Node.js (Express + SQLite)",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "test": "node --test",
+    "seed": "node server/scripts/seed.js",
+    "check:repo": "node server/scripts/check-repository.js"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
