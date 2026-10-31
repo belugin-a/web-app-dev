@@ -5,3 +5,7 @@ data/*.db
 data/*.db-journal
 data/*.db-wal
 data/*.db-shm
+
+# Корневой .gitignore исключает любую папку scripts/.
+# Здесь эти скрипты — часть задания, поэтому возвращаем их в индекс.
+!server/scripts/

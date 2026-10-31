@@ -1,0 +1,49 @@
+/* Заглушка — будет заменён полноценными стилями на этапе 5. */
+
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --text: #e8eaf0;
+  --muted: #9aa1b1;
+  --accent: #4c8dff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 2rem 1rem;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 "Segoe UI", system-ui, sans-serif;
+}
+
+.stub {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  background: var(--panel);
+  border: 1px solid #262b36;
+  border-radius: 12px;
+}
+
+h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.5rem;
+}
+
+p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+}
+
+ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+a {
+  color: var(--accent);
+}
