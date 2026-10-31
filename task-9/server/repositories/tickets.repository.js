@@ -182,6 +182,81 @@ export async function count() {
   return db.prepare('SELECT COUNT(*) AS count FROM tickets').get().count;
 }
 
+/**
+ * Количество заявок, сгруппированных по одному из полей.
+ * Возвращает объект вида { 'новая': 4, 'в работе': 5 }.
+ */
+export async function countBy(column) {
+  const db = getDb();
+
+  if (!['status', 'priority', 'assignee'].includes(column)) {
+    throw new Error(`Недопустимое поле для группировки: ${column}`);
+  }
+
+  const rows = db
+    .prepare(`SELECT ${column} AS value, COUNT(*) AS count FROM tickets GROUP BY ${column}`)
+    .all();
+
+  return Object.fromEntries(rows.map((row) => [row.value, row.count]));
+}
+
+/**
+ * Сырые данные для сводки: сколько заявок в каждом статусе и приоритете,
+ * среднее время решения в часах и список незакрытых заявок с датой создания.
+ *
+ * Сроки (SLA) и признак просрочки считаются не здесь, а в слое
+ * бизнес-логики — это правила предметной области, а не запрос к базе.
+ */
+export async function statsRaw() {
+  const db = getDb();
+
+  const byStatus = Object.fromEntries(
+    db
+      .prepare('SELECT status AS value, COUNT(*) AS count FROM tickets GROUP BY status')
+      .all()
+      .map((row) => [row.value, row.count]),
+  );
+
+  const byPriority = Object.fromEntries(
+    db
+      .prepare('SELECT priority AS value, COUNT(*) AS count FROM tickets GROUP BY priority')
+      .all()
+      .map((row) => [row.value, row.count]),
+  );
+
+  const average = db
+    .prepare(
+      `SELECT (julianday(updated_at) - julianday(created_at)) * 24 AS hours
+       FROM tickets
+       WHERE status IN ('решена', 'закрыта')`,
+    )
+    .all();
+
+  const averageHours = average.length
+    ? average.reduce((sum, row) => sum + row.hours, 0) / average.length
+    : 0;
+
+  const open = db
+    .prepare(
+      `SELECT id, priority, created_at FROM tickets
+       WHERE status NOT IN ('решена', 'закрыта')`,
+    )
+    .all()
+    .map((row) => ({
+      id: row.id,
+      priority: row.priority,
+      createdAt: row.created_at,
+    }));
+
+  return {
+    total: db.prepare('SELECT COUNT(*) AS count FROM tickets').get().count,
+    byStatus,
+    byPriority,
+    averageHours: Math.round(averageHours * 10) / 10,
+    open,
+  };
+}
+
 /** Массовая вставка — используется для заполнения демо-данными. */
 export async function insertMany(tickets) {
   const db = getDb();

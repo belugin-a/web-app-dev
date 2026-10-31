@@ -12,7 +12,8 @@
     "dev": "node --watch server/server.js",
     "test": "node --test",
     "seed": "node server/scripts/seed.js",
-    "check:repo": "node server/scripts/check-repository.js"
+    "check:repo": "node server/scripts/check-repository.js",
+    "check:service": "node server/scripts/check-service.js"
   },
   "dependencies": {
     "express": "^5.3.0"
