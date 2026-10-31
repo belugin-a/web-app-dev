@@ -25,8 +25,10 @@ const state = {
     search: '',
     sortBy: 'createdAt',
     sortOrder: 'desc',
+    overdue: '',
   },
   editing: null,
+  pendingDelete: null,
 };
 
 const elements = {
@@ -35,12 +37,24 @@ const elements = {
   clock: document.getElementById('clock'),
 
   kpiTotal: document.getElementById('kpi-total'),
+  kpiTotalNote: document.getElementById('kpi-total-note'),
+  kpiToggle: document.getElementById('kpi-toggle'),
   kpiOpen: document.getElementById('kpi-open'),
   kpiOverdue: document.getElementById('kpi-overdue'),
+  kpiOverdueNote: document.getElementById('kpi-overdue-note'),
   kpiOverdueCard: document.getElementById('kpi-overdue-card'),
   kpiAverage: document.getElementById('kpi-average'),
 
+  overdueChip: document.getElementById('filter-overdue-chip'),
+
+  deleteDialog: document.getElementById('delete-dialog'),
+  deleteText: document.getElementById('delete-text'),
+  deleteConfirm: document.getElementById('delete-confirm'),
+  deleteCancel: document.getElementById('delete-cancel'),
+
   pipeline: document.getElementById('pipeline'),
+  pipelineCollapse: document.getElementById('pipeline-collapse'),
+  pipelineBody: document.getElementById('pipeline-body'),
   slaSummary: document.getElementById('sla-summary'),
 
   boardBody: document.getElementById('board-body'),
@@ -54,8 +68,10 @@ const elements = {
   filterReset: document.getElementById('filter-reset'),
 
   createForm: document.getElementById('create-form'),
-  createTitle: document.getElementById('create-title'),
-  createDescription: document.getElementById('create-description'),
+  createDialog: document.getElementById('create-dialog'),
+  openCreate: document.getElementById('open-create'),
+  createCancel: document.getElementById('create-cancel'),
+  createTitle: document.getElementById('create-title'),  createDescription: document.getElementById('create-description'),
   createPriority: document.getElementById('create-priority'),
   createAssignee: document.getElementById('create-assignee'),
   createPriorityHint: document.getElementById('create-priority-hint'),
@@ -75,6 +91,10 @@ const elements = {
   editCancel: document.getElementById('edit-cancel'),
 
   toasts: document.getElementById('toasts'),
+
+  openInfo: document.getElementById('open-info'),
+  infoDialog: document.getElementById('info-dialog'),
+  infoClose: document.getElementById('info-close'),
 };
 
 /* ------------------------------------------------------------------ */
@@ -174,9 +194,60 @@ function renderStats() {
   elements.kpiAverage.textContent = stats.averageHours > 0 ? `${stats.averageHours} ч` : '—';
 
   elements.kpiOverdueCard.classList.toggle('kpi--alert', stats.overdue > 0);
-  elements.kpiOverdue.nextElementSibling.textContent = stats.overdue
-    ? 'вышли за срок обработки'
+  elements.kpiOverdueNote.textContent = stats.overdue
+    ? 'вышли за срок'
     : 'все в срок';
+}
+
+/**
+ * Разбивка по статусам скрыта по умолчанию и раскрывается по клику
+ * на плитку «Всего заявок». Повторный клик снова её скрывает.
+ */
+function setPipelineOpen(open) {
+  elements.pipeline.classList.toggle('is-collapsed', !open);
+  elements.pipelineCollapse.classList.toggle('is-collapsed', !open);
+  elements.kpiToggle.setAttribute('aria-expanded', String(open));
+  elements.kpiTotalNote.textContent = open ? 'в базе' : 'разбить по статусам';
+}
+
+function togglePipeline() {
+  const isOpen = elements.kpiToggle.getAttribute('aria-expanded') === 'true';
+
+  setPipelineOpen(!isOpen);
+}
+
+/**
+ * Фильтр «только просроченные»: включает и выключает плитку
+ * «Просрочено» в сводке.
+ */
+function setOverdueFilter(active) {
+  state.filters.overdue = active ? 'true' : '';
+
+  elements.kpiOverdueCard.setAttribute('aria-pressed', String(active));
+  elements.overdueChip.hidden = !active;
+
+  applyFilters();
+}
+
+function toggleOverdueFilter() {
+  const isActive = elements.kpiOverdueCard.getAttribute('aria-pressed') === 'true';
+
+  setOverdueFilter(!isActive);
+}
+
+/**
+ * Горизонтальная линия: чем больше заявок в статусе, тем длиннее полоска.
+ * Длина отсчитывается от самого частого статуса — он занимает всю ширину.
+ */
+function buildBar(count, max) {
+  const bar = el('div', 'bar');
+  const fill = el('span', 'bar__fill');
+
+  fill.style.width = `${Math.round((count / max) * 100)}%`;
+
+  bar.append(fill);
+
+  return bar;
 }
 
 function renderPipeline() {
@@ -187,30 +258,62 @@ function renderPipeline() {
   }
 
   const statuses = state.meta?.statuses ?? [];
-  const max = Math.max(1, ...Object.values(stats.byStatus));
+  const counts = statuses.map((status) => stats.byStatus[status] ?? 0);
+  const max = Math.max(1, ...counts);
 
-  elements.pipeline.replaceChildren(
-    ...statuses.map((status) => {
-      const count = stats.byStatus[status] ?? 0;
-      const item = el('li', 'pipeline__item');
+  const rows = statuses.map((status, index) => {
+    const row = el('tr', 'pipeline__row');
 
-      item.append(el('span', 'pipeline__name', status));
-      item.append(el('span', 'pipeline__count', String(count)));
+    row.dataset.status = status;
+    row.tabIndex = 0;
 
-      const bar = el('div', 'pipeline__bar');
-      const fill = el('div', 'pipeline__bar-fill');
-      fill.style.width = `${(count / max) * 100}%`;
-      bar.append(fill);
-      item.append(bar);
+    if (state.filters.status === status) {
+      row.classList.add('is-active');
+      row.setAttribute('aria-pressed', 'true');
+    } else {
+      row.setAttribute('aria-pressed', 'false');
+    }
 
-      return item;
-    }),
-  );
+    row.append(el('td', 'pipeline__name', status));
+    row.append(el('td', 'pipeline__count', String(counts[index])));
+
+    const barCell = el('td', 'pipeline__bar-cell');
+
+    const bar = buildBar(counts[index], max);
+    bar.title = `${status} — ${counts[index]} ${counts[index] === 1 ? 'заявка' : 'заявок'}`;
+
+    barCell.append(bar);
+    row.append(barCell);
+
+    row.addEventListener('click', () => toggleStatusFilter(status));
+    row.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleStatusFilter(status);
+      }
+    });
+
+    return row;
+  });
+
+  elements.pipelineBody.replaceChildren(...rows);
 
   const sla = state.meta?.slaHours ?? {};
   elements.slaSummary.textContent = Object.entries(sla)
     .map(([priority, hours]) => `${priority} — ${hours} ч`)
     .join(' · ');
+}
+
+/**
+ * Клик по строке таблицы статусов накладывает фильтр по этому статусу
+ * на список заявок. Повторный клик снимает фильтр.
+ */
+function toggleStatusFilter(status) {
+  const next = state.filters.status === status ? '' : status;
+
+  elements.filterStatus.value = next;
+
+  applyFilters();
 }
 
 /** Собирает карточку заявки. */
@@ -363,13 +466,26 @@ async function onChangeStatus(ticket, status) {
 }
 
 async function onDelete(ticket) {
-  const confirmed = window.confirm(
-    `Удалить заявку №${ticket.id}?\n\n«${ticket.title}»\n\nУдалить можно только заявки в статусе «новая».`,
-  );
+  // Подтверждение удаления — модальным окном, а не системным диалогом.
+  state.pendingDelete = ticket;
 
-  if (!confirmed) {
+  elements.deleteText.textContent = `Заявка №${ticket.id} «${ticket.title}» будет удалена безвозвратно.`;
+
+  elements.deleteDialog.showModal();
+  elements.deleteConfirm.focus();
+}
+
+/** Подтверждение удаления: сам запрос и обновление списка. */
+async function confirmDelete() {
+  const ticket = state.pendingDelete;
+
+  elements.deleteDialog.close();
+
+  if (!ticket) {
     return;
   }
+
+  state.pendingDelete = null;
 
   try {
     await api.deleteTicket(ticket.id);
@@ -397,7 +513,10 @@ async function onCreate(event) {
     const { ticket } = await api.createTicket(payload);
 
     toast(`Заявка №${ticket.id} создана`);
+
+    elements.createDialog.close();
     elements.createForm.reset();
+    elements.createError.hidden = true;
     updatePriorityHint(elements.createPriority, elements.createPriorityHint);
 
     await refresh();
@@ -457,8 +576,13 @@ async function onEditSubmit(event) {
 /* Справочники и фильтры                                               */
 /* ------------------------------------------------------------------ */
 
-/** Заполняет выпадающий список вариантами. */
-function fillSelect(select, values, { keepFirst = true, label = null } = {}) {
+/**
+ * Заполняет выпадающий список вариантами.
+ *
+ * selected — значение, которое будет выбрано по умолчанию. Оно же помечается
+ * как defaultSelected, чтобы сброс формы (form.reset) возвращал именно его.
+ */
+function fillSelect(select, values, { keepFirst = true, label = null, selected = null } = {}) {
   const current = select.value;
 
   select.replaceChildren();
@@ -472,10 +596,17 @@ function fillSelect(select, values, { keepFirst = true, label = null } = {}) {
   for (const value of values) {
     const option = el('option', null, value);
     option.value = value;
+
+    if (value === selected) {
+      option.defaultSelected = true;
+    }
+
     select.append(option);
   }
 
-  if (current && values.includes(current)) {
+  if (selected && values.includes(selected)) {
+    select.value = selected;
+  } else if (current && values.includes(current)) {
     select.value = current;
   }
 }
@@ -492,17 +623,25 @@ async function loadMeta() {
 
   fillSelect(elements.filterStatus, state.meta.statuses, { label: 'Все статусы' });
   fillSelect(elements.filterPriority, state.meta.priorities, { label: 'Все приоритеты' });
-  fillSelect(elements.createPriority, state.meta.priorities, { keepFirst: false });
+
+  // Приоритет по умолчанию — «обычный»: самый частый случай.
+  fillSelect(elements.createPriority, state.meta.priorities, {
+    keepFirst: false,
+    selected: 'обычный',
+  });
   fillSelect(elements.editPriority, state.meta.priorities, { keepFirst: false });
 
-  const assignees = [...new Set(state.tickets.map((ticket) => ticket.assignee).filter(Boolean))];
+  const executors = state.meta.executors ?? [];
 
-  if (assignees.length) {
-    fillSelect(elements.filterAssignee, assignees, { label: 'Все исполнители' });
-  }
+  fillSelect(elements.filterAssignee, executors, { label: 'Все исполнители' });
 
-  fillSelect(elements.createAssignee, assignees, { label: 'Не назначен' });
-  fillSelect(elements.editAssignee, assignees, { label: 'Не назначен' });
+  // Отдельный пункт — заявки, которым ещё не назначен исполнитель.
+  const unassigned = el('option', null, 'Без исполнителя');
+  unassigned.value = 'none';
+  elements.filterAssignee.append(unassigned);
+
+  fillSelect(elements.createAssignee, executors, { label: 'Не назначен' });
+  fillSelect(elements.editAssignee, executors, { label: 'Не назначен' });
 
   updatePriorityHint(elements.createPriority, elements.createPriorityHint);
   updatePriorityHint(elements.editPriority, elements.editPriorityHint);
@@ -520,6 +659,9 @@ function applyFilters() {
   state.filters.sortBy = sortBy;
   state.filters.sortOrder = sortOrder;
 
+  // Перерисовываем таблицу статусов, чтобы отметить активную строку.
+  renderPipeline();
+
   loadTickets();
 }
 
@@ -529,6 +671,10 @@ function resetFilters() {
   elements.filterPriority.value = '';
   elements.filterAssignee.value = '';
   elements.filterSort.value = 'createdAt:desc';
+
+  state.filters.overdue = '';
+  elements.kpiOverdueCard.setAttribute('aria-pressed', 'false');
+  elements.overdueChip.hidden = true;
 
   applyFilters();
 }
@@ -549,6 +695,32 @@ async function checkHealth() {
   }
 }
 
+/**
+ * Высота шапки нужна панели фильтров: та прилипает ровно под ней.
+ * Измеряем в браузере, чтобы значение не зависело от брейкпоинта.
+ */
+function trackTopbarHeight() {
+  const topbar = document.querySelector('.topbar');
+
+  if (!topbar) {
+    return;
+  }
+
+  const update = () => {
+    const height = Math.round(topbar.getBoundingClientRect().height);
+
+    document.documentElement.style.setProperty('--topbar-h', `${height}px`);
+  };
+
+  update();
+
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(update).observe(topbar);
+  } else {
+    window.addEventListener('resize', update);
+  }
+}
+
 function startClock() {
   const tick = () => {
     elements.clock.textContent = new Date().toLocaleString('ru-RU', {
@@ -566,6 +738,33 @@ function startClock() {
 function bindEvents() {
   elements.createForm.addEventListener('submit', onCreate);
   elements.editForm.addEventListener('submit', onEditSubmit);
+
+  elements.kpiToggle.addEventListener('click', togglePipeline);
+
+  elements.kpiOverdueCard.addEventListener('click', toggleOverdueFilter);
+  elements.overdueChip.addEventListener('click', () => setOverdueFilter(false));
+
+  elements.deleteConfirm.addEventListener('click', confirmDelete);
+  elements.deleteCancel.addEventListener('click', () => {
+    state.pendingDelete = null;
+    elements.deleteDialog.close();
+  });
+
+  elements.openInfo.addEventListener('click', () => elements.infoDialog.showModal());
+  elements.infoClose.addEventListener('click', () => elements.infoDialog.close());
+
+  elements.openCreate.addEventListener('click', () => {
+    // Каждое открытие — с чистой формой: черновик из прошлого раза не должен
+    // уйти в заявку по невнимательности.
+    elements.createForm.reset();
+    elements.createError.hidden = true;
+    updatePriorityHint(elements.createPriority, elements.createPriorityHint);
+
+    elements.createDialog.showModal();
+    elements.createTitle.focus();
+  });
+
+  elements.createCancel.addEventListener('click', () => elements.createDialog.close());
 
   elements.editCancel.addEventListener('click', () => elements.editDialog.close());
 
@@ -594,6 +793,10 @@ function bindEvents() {
 async function start() {
   bindEvents();
   startClock();
+  trackTopbarHeight();
+
+  // Разбивка по статусам изначально скрыта.
+  setPipelineOpen(false);
 
   await checkHealth();
 

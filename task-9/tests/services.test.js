@@ -55,6 +55,38 @@ test('неизвестный статус в фильтре отклоняетс
   await assert.rejects(() => listTickets({ status: 'несуществующий' }), { status: 400 });
 });
 
+test('фильтр «none» отбирает заявки без исполнителя', async () => {
+  const result = await listTickets({ assignee: 'none' });
+
+  assert.ok(result.total > 0, 'есть заявки без исполнителя');
+  assert.ok(result.items.every((ticket) => ticket.assignee === ''));
+});
+
+test('фильтр по исполнителю отбирает только его заявки', async () => {
+  const result = await listTickets({ assignee: 'Пётр Крылов' });
+
+  assert.ok(result.total > 0);
+  assert.ok(result.items.every((ticket) => ticket.assignee === 'Пётр Крылов'));
+});
+
+test('фильтр по просроченным отбирает только просроченные', async () => {
+  const result = await listTickets({ overdue: 'true' });
+
+  assert.ok(result.total > 0, 'есть просроченные заявки');
+  assert.ok(result.items.every((ticket) => ticket.isOverdue));
+});
+
+test('список просроченных совпадает со сводкой', async () => {
+  const result = await listTickets({ overdue: 'true' });
+  const stats = await getStats();
+
+  assert.equal(result.total, stats.overdue);
+  assert.deepEqual(
+    result.items.map((ticket) => ticket.id).sort((a, b) => a - b),
+    [...stats.overdueIds].sort((a, b) => a - b),
+  );
+});
+
 test('создание заявки даёт статус «новая»', async () => {
   const ticket = await createTicket({
     title: 'Тестовая заявка для автотеста',
@@ -149,6 +181,7 @@ test('справочные значения содержат статусы, п�
 
   assert.equal(meta.statuses.length, 5);
   assert.equal(meta.priorities.length, 4);
+  assert.ok(meta.executors.length > 0, 'есть список исполнителей');
   assert.deepEqual(meta.transitions['закрыта'], []);
   assert.deepEqual(meta.transitions['новая'], ['в работе', 'закрыта']);
 });

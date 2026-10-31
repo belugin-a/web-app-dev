@@ -27,7 +27,20 @@
           </svg>
         </span>
         <span class="brand__title">Заявки в IT-поддержку</span>
-        <span class="brand__tag">ПР9</span>
+        <button type="button" class="info-btn" id="open-info" aria-label="Как это работает">
+          <span aria-hidden="true">ⓘ</span>
+        </button>
+      </div>
+
+      <div class="topbar__actions">
+        <button type="button" class="btn btn--primary btn--sm" id="open-create" aria-label="Новая заявка">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" aria-hidden="true">
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
+          <span class="btn__label">Новая заявка</span>
+        </button>
       </div>
 
       <div class="topbar__meta">
@@ -42,21 +55,30 @@
 
   <main class="page">
     <section class="kpis" aria-label="Сводка по заявкам">
-      <article class="kpi">
-        <p class="kpi__label">Всего заявок</p>
-        <p class="kpi__value" id="kpi-total">—</p>
-        <p class="kpi__note" id="kpi-total-note">в базе</p>
-      </article>
+      <button type="button" class="kpi kpi--toggle" id="kpi-toggle" aria-expanded="false"
+        aria-controls="pipeline-collapse">
+        <span class="kpi__label">Всего заявок</span>
+        <span class="kpi__value" id="kpi-total">—</span>
+        <span class="kpi__note" id="kpi-total-note">разбить по статусам</span>
+        <span class="kpi__caret" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </span>
+      </button>
       <article class="kpi">
         <p class="kpi__label">Открытых</p>
         <p class="kpi__value" id="kpi-open">—</p>
         <p class="kpi__note">новая, в работе, ожидает</p>
       </article>
-      <article class="kpi" id="kpi-overdue-card">
-        <p class="kpi__label">Просрочено</p>
-        <p class="kpi__value" id="kpi-overdue">—</p>
-        <p class="kpi__note" id="kpi-overdue-note">вышли за срок</p>
-      </article>
+      <button type="button" class="kpi kpi--toggle" id="kpi-overdue-card" aria-pressed="false"
+        aria-controls="board-body">
+        <span class="kpi__label">Просрочено</span>
+        <span class="kpi__value" id="kpi-overdue">—</span>
+        <span class="kpi__note" id="kpi-overdue-note">вышли за срок</span>
+        <span class="kpi__hint">показать просроченные</span>
+      </button>
       <article class="kpi">
         <p class="kpi__label">Среднее время решения</p>
         <p class="kpi__value" id="kpi-average">—</p>
@@ -64,12 +86,31 @@
       </article>
     </section>
 
-    <section class="pipeline" aria-label="Распределение по статусам">
-      <div class="pipeline__head">
-        <h2>В работе по статусам</h2>
-        <p class="pipeline__hint">Сроки обработки: <span id="sla-summary">—</span></p>
+    <section class="pipeline is-collapsed" id="pipeline" aria-label="Заявки по статусам">
+      <div class="pipeline__collapse is-collapsed" id="pipeline-collapse">
+        <div class="pipeline__inner">
+          <div class="pipeline__card">
+            <div class="pipeline__head">
+              <h2>Заявки по статусам</h2>
+              <p class="pipeline__hint">Сроки обработки: <span id="sla-summary">—</span></p>
+            </div>
+
+            <table class="pipeline__table">
+              <caption class="visually-hidden">
+                Распределение заявок по статусам. Нажмите на строку, чтобы отфильтровать список заявок.
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Статус</th>
+                  <th scope="col" class="pipeline__col-count">Заявок</th>
+                  <th scope="col" class="pipeline__col-bar">Шкала</th>
+                </tr>
+              </thead>
+              <tbody id="pipeline-body"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
-      <ol class="pipeline__list" id="pipeline"></ol>
     </section>
 
     <div class="layout">
@@ -113,6 +154,11 @@
             </select>
           </div>
 
+          <button type="button" class="chip" id="filter-overdue-chip" hidden>
+            Только просроченные
+            <span class="chip__close" aria-hidden="true">✕</span>
+          </button>
+
           <button type="button" class="btn btn--ghost btn--sm" id="filter-reset">Сбросить</button>
         </div>
 
@@ -126,54 +172,77 @@
         </div>
       </section>
 
-      <aside class="side">
-        <section class="card">
-          <h2>Новая заявка</h2>
-
-          <form class="form" id="create-form" novalidate>
-            <div class="field">
-              <label class="field__label" for="create-title">Тема <span class="req">*</span></label>
-              <input type="text" id="create-title" name="title" required minlength="5" maxlength="120"
-                placeholder="Например: не включается проектор в кабинете 2.11">
-            </div>
-
-            <div class="field">
-              <label class="field__label" for="create-description">Описание</label>
-              <textarea id="create-description" name="description" maxlength="2000" rows="4"
-                placeholder="Что случилось, что уже пробовали сделать"></textarea>
-            </div>
-
-            <div class="field">
-              <label class="field__label" for="create-priority">Приоритет <span class="req">*</span></label>
-              <select id="create-priority" name="priority" required></select>
-              <p class="hint" id="create-priority-hint">—</p>
-            </div>
-
-            <div class="field">
-              <label class="field__label" for="create-assignee">Исполнитель</label>
-              <select id="create-assignee" name="assignee">
-                <option value="">Не назначен</option>
-              </select>
-            </div>
-
-            <p class="form__error" id="create-error" hidden></p>
-
-            <button type="submit" class="btn btn--primary" id="create-submit">Создать заявку</button>
-          </form>
-        </section>
-
-        <section class="card card--muted">
-          <h2>Как это работает</h2>
-          <ul class="rules">
-            <li>Новая заявка всегда попадает в статус <b>«новая»</b>.</li>
-            <li>Статус меняется только по разрешённым переходам — иначе сервер вернёт отказ.</li>
-            <li>Удалить можно лишь заявку в статусе <b>«новая»</b>.</li>
-            <li>Срок обработки зависит от приоритета: критичный — 4 ч, высокий — 8 ч, обычный — 24 ч, низкий — 72 ч.</li>
-          </ul>
-        </section>
-      </aside>
     </div>
   </main>
+
+  <dialog class="dialog" id="delete-dialog">
+    <div class="dialog__body">
+      <h2 class="dialog__title">Удалить заявку?</h2>
+      <p class="dialog__text" id="delete-text">—</p>
+      <p class="dialog__note">Удалить можно только заявки в статусе «новая» — с остальными работа уже начата.</p>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn btn--ghost" id="delete-cancel">Отмена</button>
+        <button type="button" class="btn btn--danger" id="delete-confirm">Удалить</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="dialog" id="info-dialog">
+    <div class="dialog__body">
+      <h2 class="dialog__title">Как это работает</h2>
+
+      <ul class="rules">
+        <li>Новая заявка всегда попадает в статус <b>«новая»</b>.</li>
+        <li>Статус меняется только по разрешённым переходам — иначе сервер вернёт отказ.</li>
+        <li>Удалить можно лишь заявку в статусе <b>«новая»</b>.</li>
+        <li>Срок обработки зависит от приоритета: критичный — 4 ч, высокий — 8 ч, обычный — 24 ч, низкий — 72 ч.</li>
+      </ul>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn btn--primary" id="info-close">Понятно</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="dialog" id="create-dialog">
+    <form class="dialog__body" id="create-form" method="dialog" novalidate>
+      <h2 class="dialog__title">Новая заявка</h2>
+      <p class="dialog__text">Заявка попадёт в статус «новая». Статус меняется по разрешённым переходам.</p>
+
+      <div class="field">
+        <label class="field__label" for="create-title">Тема <span class="req">*</span></label>
+        <input type="text" id="create-title" name="title" required minlength="5" maxlength="120"
+          placeholder="Например: не включается проектор в кабинете 2.11">
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="create-description">Описание</label>
+        <textarea id="create-description" name="description" maxlength="2000" rows="4"
+          placeholder="Что случилось, что уже пробовали сделать"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="create-priority">Приоритет <span class="req">*</span></label>
+        <select id="create-priority" name="priority" required></select>
+        <p class="hint" id="create-priority-hint">—</p>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="create-assignee">Исполнитель</label>
+        <select id="create-assignee" name="assignee">
+          <option value="">Не назначен</option>
+        </select>
+      </div>
+
+      <p class="form__error" id="create-error" hidden></p>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn btn--ghost" id="create-cancel">Отмена</button>
+        <button type="submit" class="btn btn--primary" id="create-submit">Создать заявку</button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog class="dialog" id="edit-dialog">
     <form class="dialog__body" id="edit-form" method="dialog">

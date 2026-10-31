@@ -25,6 +25,15 @@ export const STATUSES = ['новая', 'в работе', 'ожидает', 'р�
 /** Допустимые приоритеты заявки. */
 export const PRIORITIES = ['низкий', 'обычный', 'высокий', 'критичный'];
 
+/** Сотрудники службы поддержки — из них назначаются исполнители. */
+export const EXECUTORS = [
+  'Ирина Соколова',
+  'Пётр Крылов',
+  'Анна Дроздова',
+  'Сергей Белов',
+  'Марина Ковалёва',
+];
+
 /**
  * Таблица переходов статусов: из каких статусов в какие можно перейти.
  * Статус «закрыта» — терминальный, из него переходов нет.
@@ -161,12 +170,36 @@ function decorate(ticket) {
 /**
  * Список заявок с фильтрами, поиском и сортировкой.
  * Фильтры проверяются: неизвестный статус или приоритет — ошибка 400.
+ *
+ * Особое значение фильтра по исполнителю — «none»: заявки без исполнителя.
+ */
+/**
+ * Номера просроченных заявок: открытые заявки, у которых срок обработки
+ * по приоритету уже истёк. Правило одно и то же для сводки и для
+ * фильтра — поэтому считается в одном месте.
+ */
+function findOverdue(open) {
+  return open.filter((ticket) => {
+    const dueAt = new Date(ticket.createdAt).getTime() + SLA_HOURS[ticket.priority] * 3600_000;
+
+    return Date.now() > dueAt;
+  });
+}
+
+/**
+ * Список заявок с фильтрами, поиском и сортировкой.
+ * Фильтры проверяются: неизвестный статус или приоритет — ошибка 400.
+ *
+ * Особые значения:
+ *   assignee=none — заявки без исполнителя;
+ *   overdue=true — только просроченные заявки.
  */
 export async function listTickets(filters = {}) {
   const status = clean(filters.status);
   const priority = clean(filters.priority);
   const assignee = clean(filters.assignee);
   const search = clean(filters.search);
+  const overdueOnly = filters.overdue === true || filters.overdue === 'true';
 
   if (status) {
     assertOneOf(status, STATUSES, 'Статус', 'Неизвестный статус');
@@ -176,10 +209,23 @@ export async function listTickets(filters = {}) {
     assertOneOf(priority, PRIORITIES, 'Приоритет', 'Неизвестный приоритет');
   }
 
+  const wantsUnassigned = assignee === 'none';
+
+  // Просроченные заявки определяет бизнес-логика, база лишь отбирает
+  // по вычисленному списку номеров.
+  let ids;
+
+  if (overdueOnly) {
+    const { open } = await statsRaw();
+    ids = findOverdue(open).map((ticket) => ticket.id);
+  }
+
   const { items, total } = await repoList({
     status,
     priority,
-    assignee,
+    assignee: wantsUnassigned ? '' : assignee,
+    assigneeUnassigned: wantsUnassigned,
+    ids,
     search,
     sortBy: clean(filters.sortBy),
     sortOrder: clean(filters.sortOrder),
@@ -317,11 +363,7 @@ export async function deleteTicket(id) {
 export async function getStats() {
   const raw = await statsRaw();
 
-  const overdue = raw.open.filter((ticket) => {
-    const dueAt = new Date(ticket.createdAt).getTime() + SLA_HOURS[ticket.priority] * 3600_000;
-
-    return Date.now() > dueAt;
-  });
+  const overdue = findOverdue(raw.open);
 
   const byStatus = {};
   for (const status of STATUS_ORDER) {
@@ -353,6 +395,7 @@ export function getMeta() {
   return {
     statuses: STATUSES,
     priorities: PRIORITIES,
+    executors: EXECUTORS,
     transitions: TRANSITIONS,
     slaHours: SLA_HOURS,
     limits: LIMITS,

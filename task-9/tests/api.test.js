@@ -55,6 +55,7 @@ test('GET /api/meta отдаёт статусы, приоритеты и пер�
   assert.equal(status, 200);
   assert.equal(body.statuses.length, 5);
   assert.equal(body.priorities.length, 4);
+  assert.ok(body.executors.length > 0, 'есть список исполнителей');
   assert.deepEqual(body.transitions['закрыта'], []);
 });
 
@@ -78,6 +79,22 @@ test('GET /api/tickets с неизвестным фильтром отдаёт 4
 
   assert.equal(status, 400);
   assert.match(body.error, /Неизвестный статус/);
+});
+
+test('GET /api/tickets?assignee=none отдаёт заявки без исполнителя', async () => {
+  const { status, body } = await request('GET', '/api/tickets?assignee=none');
+
+  assert.equal(status, 200);
+  assert.ok(body.total > 0);
+  assert.ok(body.items.every((ticket) => ticket.assignee === ''));
+});
+
+test('GET /api/tickets?overdue=true отдаёт только просроченные', async () => {
+  const { status, body } = await request('GET', '/api/tickets?overdue=true');
+
+  assert.equal(status, 200);
+  assert.ok(body.total > 0);
+  assert.ok(body.items.every((ticket) => ticket.isOverdue));
 });
 
 test('GET /api/tickets/:id отдаёт заявку', async () => {

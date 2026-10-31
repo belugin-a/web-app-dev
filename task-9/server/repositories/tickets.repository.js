@@ -38,7 +38,7 @@ function toTicket(row) {
  * Имена параметров фиксированы и подставляются в SQL как параметры —
  * пользовательские значения в текст запроса не попадают.
  */
-function buildFilters({ status, priority, assignee, search }) {
+function buildFilters({ status, priority, assignee, assigneeUnassigned, ids, search }) {
   const conditions = [];
   const params = {};
 
@@ -52,9 +52,27 @@ function buildFilters({ status, priority, assignee, search }) {
     params.priority = priority;
   }
 
-  if (assignee) {
+  if (assigneeUnassigned) {
+    // Заявки, которым ещё не назначен исполнитель.
+    conditions.push("assignee = ''");
+  } else if (assignee) {
     conditions.push('assignee = :assignee');
     params.assignee = assignee;
+  }
+
+  if (Array.isArray(ids)) {
+    // Отбор по готовому списку номеров: набор просроченных заявок
+    // считает бизнес-логика, а база только отбирает по нему.
+    if (ids.length === 0) {
+      conditions.push('1 = 0');
+    } else {
+      const placeholders = ids.map((_, index) => `:id${index}`);
+      conditions.push(`id IN (${placeholders.join(', ')})`);
+
+      ids.forEach((id, index) => {
+        params[`id${index}`] = id;
+      });
+    }
   }
 
   if (search) {

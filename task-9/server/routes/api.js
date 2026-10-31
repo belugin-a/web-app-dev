@@ -61,7 +61,8 @@ apiRouter.get('/stats', async (req, res) => {
 
 // GET /api/tickets — список с фильтрами, поиском, сортировкой и постраничностью.
 apiRouter.get('/tickets', async (req, res) => {
-  const { status, priority, assignee, search, sortBy, sortOrder, limit, offset } = req.query;
+  const { status, priority, assignee, search, sortBy, sortOrder, limit, offset, overdue } =
+    req.query;
 
   const result = await listTickets({
     status,
@@ -72,6 +73,7 @@ apiRouter.get('/tickets', async (req, res) => {
     sortOrder,
     limit,
     offset,
+    overdue,
   });
 
   res.json(result);
