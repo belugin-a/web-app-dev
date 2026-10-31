@@ -5,3 +5,8 @@ data/*.db
 data/*.db-journal
 data/*.db-wal
 data/*.db-shm
+
+# Артефакты прогонов Playwright
+test-results/
+playwright-report/
+blob-report/
