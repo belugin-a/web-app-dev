@@ -1,14 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  boardState,
-  expectNoTicket,
-  expectTicket,
   lastToast,
   login,
   register,
   uniqueEmail,
-  waitForBoard,
 } from './helpers.js';
 
 /**

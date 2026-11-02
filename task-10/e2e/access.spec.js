@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { expectNoTicket, expectTicket, lastToast, login, waitForBoard } from './helpers.js';
+import { expectNoTicket, expectTicket, lastToast, login } from './helpers.js';
 
 /**
  * E-01 … E-08 — редактирование, смена статуса, удаление, ограничения по роли.

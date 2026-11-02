@@ -1,13 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  boardState,
-  expectNoTicket,
-  expectTicket,
-  lastToast,
-  login,
-  waitForBoard,
-} from './helpers.js';
+import { expectTicket, lastToast, login } from './helpers.js';
 
 /**
  * C-01 … C-07 — создание заявки.
@@ -38,8 +31,6 @@ test('C-01: авторизованный пользователь создаёт
 test('C-02: короткая тема отклоняется с сообщением у поля', async ({ page }) => {
   await login(page, 'user@example.com', 'user12345');
 
-  const before = await boardState(page);
-
   await page.locator('#open-create').click();
   await page.locator('#create-title').fill('Ок');
   await page.locator('#create-submit').click();
@@ -50,7 +41,11 @@ test('C-02: короткая тема отклоняется с сообщени
   // Введённые данные не сброшены, заявка не создана.
   await expect(page.locator('#create-title')).toHaveValue('Ок');
   await expect(page.locator('#create-dialog')).toBeVisible();
-  expect((await boardState(page)).shown).toBe(before.shown);
+
+  // Темы сравниваются целиком: подстрока «Ок» встречается, например, в слове «срок».
+  const titles = await page.locator('.ticket__title').allTextContents();
+
+  expect(titles.map((title) => title.trim())).not.toContain('Ок');
 });
 
 test('C-02: пустая тема отклоняется', async ({ page }) => {

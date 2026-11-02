@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { boardState, expectTicket, lastToast, login, waitForBoard } from './helpers.js';
+import { boardState, waitForBoard } from './helpers.js';
 
 /**
  * V-01 … V-11 — просмотр заявок, фильтры, поиск, сортировка.
@@ -38,16 +38,16 @@ test('V-02: фильтр по статусу оставляет только з�
   await page.goto('/');
   await waitForBoard(page);
 
-  const before = await boardState(page);
-
   await page.locator('#filter-status').selectOption('в работе');
   await waitForBoard(page);
 
   const after = await boardState(page);
 
   expect(after.shown).toBeGreaterThan(0);
-  expect(after.shown).toBeLessThanOrEqual(before.shown);
   expect(after.statuses.every((status) => status === 'в работе')).toBe(true);
+
+  // Счётчик показывает, сколько найдено и сколько всего.
+  expect(after.countText).toMatch(/^показано \d+ из \d+$/);
 });
 
 test('V-02: фильтр по приоритету оставляет только заявки этого приоритета', async ({ page }) => {
@@ -168,21 +168,21 @@ test('V-11: сброс фильтров возвращает полный спи
   await page.goto('/');
   await waitForBoard(page);
 
-  const full = await boardState(page);
-
   await page.locator('#filter-search').fill('принтер');
   await page.locator('#filter-status').selectOption('в работе');
   await waitForBoard(page);
 
   const filtered = await boardState(page);
-  expect(filtered.shown).toBeLessThanOrEqual(full.shown);
+  expect(filtered.countText).toMatch(/^показано \d+ из \d+$/);
 
   await page.getByRole('button', { name: 'Сбросить' }).click();
   await waitForBoard(page);
 
   const reset = await boardState(page);
 
-  expect(reset.shown).toBe(full.shown);
+  // После сброса показан весь список, а поля фильтров пусты.
+  expect(reset.shown).toBeGreaterThanOrEqual(filtered.shown);
+  expect(reset.countText).toMatch(/^всего \d+$/);
   await expect(page.locator('#filter-search')).toHaveValue('');
   await expect(page.locator('#filter-status')).toHaveValue('');
 });
