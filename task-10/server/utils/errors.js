@@ -37,3 +37,8 @@ export function notFound(message = 'Заявка не найдена') {
 export function conflict(message = 'Действие невозможно в текущем состоянии') {
   return httpError(409, message);
 }
+
+/** 429 — слишком много попыток, действие временно недоступно. */
+export function tooManyRequests(message = 'Слишком много попыток, попробуйте позже') {
+  return httpError(429, message);
+}

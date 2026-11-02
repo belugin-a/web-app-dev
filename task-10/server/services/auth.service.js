@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 import { config } from '../config.js';
-import { badRequest, conflict, unauthorized } from '../utils/errors.js';
+import { badRequest, conflict, tooManyRequests, unauthorized } from '../utils/errors.js';
 import {
   create as repoCreate,
   existsByEmail,
@@ -22,6 +22,73 @@ import {
 const BCRYPT_ROUNDS = 10;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Сколько неудачных попыток входа допускается до временной блокировки. */
+const MAX_FAILED_ATTEMPTS = 5;
+
+/** На сколько блокируется вход после превышения лимита. */
+const LOCK_DURATION_MS = 15 * 60 * 1000;
+
+/**
+ * Неудачные попытки входа по каждому адресу.
+ *
+ * Блокировка считается по адресу, а не по учётной записи: одинаковый
+ * порог и одинаковый ответ для существующего и несуществующего адреса,
+ * поэтому перебором нельзя выяснить, какие адреса зарегистрированы.
+ */
+const loginAttempts = new Map();
+
+/**
+ * Хеш-заглушка для сравнения, когда учётной записи нет.
+ * Он нужен, чтобы ответ на запрос занимал столько же времени, сколько
+ * и настоящий вход: иначе по времени ответа можно отличить
+ * существующий адрес от несуществующего.
+ */
+let dummyHash = null;
+
+function getDummyHash() {
+  if (!dummyHash) {
+    dummyHash = bcrypt.hashSync('пароль-по-умолчанию', BCRYPT_ROUNDS);
+  }
+
+  return dummyHash;
+}
+
+/**
+ * Возвращает оставшееся время блокировки в минутах
+ * или null, если блокировки нет.
+ */
+export function getLockMinutes(email) {
+  const record = loginAttempts.get(email);
+
+  if (!record) {
+    return null;
+  }
+
+  if (record.lockedUntil && record.lockedUntil > Date.now()) {
+    return Math.ceil((record.lockedUntil - Date.now()) / 60_000);
+  }
+
+  // Блокировка истекла — дальше попытки снова считаются заново.
+  if (record.lockedUntil) {
+    loginAttempts.delete(email);
+  }
+
+  return null;
+}
+
+/** Засчитывает неудачную попытку входа и при необходимости блокирует адрес. */
+function registerFailedAttempt(email) {
+  const record = loginAttempts.get(email) ?? { count: 0, lockedUntil: null };
+
+  record.count += 1;
+
+  if (record.count >= MAX_FAILED_ATTEMPTS) {
+    record.lockedUntil = Date.now() + LOCK_DURATION_MS;
+  }
+
+  loginAttempts.set(email, record);
+}
 
 /** Приводит e-mail к общему виду: обрезанные края и нижний регистр. */
 function normalizeEmail(value) {
@@ -95,12 +162,28 @@ export async function authenticateUser(payload) {
     throw badRequest('Нужны поля email и password');
   }
 
-  const row = await getByEmailWithHash(email);
-  const matches = row ? await bcrypt.compare(body.password, row.password_hash) : false;
+  const lockedMinutes = getLockMinutes(email);
 
-  if (!matches) {
+  if (lockedMinutes) {
+    throw tooManyRequests(
+      `Слишком много неудачных попыток входа. Повторите через ${lockedMinutes} мин.`,
+    );
+  }
+
+  const row = await getByEmailWithHash(email);
+
+  // Сравнение всегда идёт с настоящим хешем: для несуществующего адреса
+  // используется хеш-заглушка, чтобы время ответа не выдавало наличие
+  // учётной записи.
+  const matches = await bcrypt.compare(body.password, row?.password_hash ?? getDummyHash());
+
+  if (!row || !matches) {
+    registerFailedAttempt(email);
     throw unauthorized('Неверный e-mail или пароль');
   }
+
+  // Успешный вход снимает счётчик неудачных попыток.
+  loginAttempts.delete(email);
 
   return getById(row.id);
 }

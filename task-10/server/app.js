@@ -23,6 +23,25 @@ app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
   res.set('X-Frame-Options', 'DENY');
   res.set('Referrer-Policy', 'same-origin');
+
+  // Приложение не использует встроенные скрипты и стили, поэтому политика
+  // строгая: разрешены только ресурсы самого сервера.
+  res.set(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      "script-src 'self'",
+      "style-src 'self'",
+      "img-src 'self' data:",
+      "font-src 'self'",
+      "connect-src 'self'",
+      "base-uri 'none'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      "object-src 'none'",
+    ].join('; '),
+  );
+
   next();
 });
 
@@ -50,6 +69,10 @@ app.use((req, res) => {
 function describeError(err) {
   if (err.type === 'entity.parse.failed') {
     return [400, 'Некорректный JSON в теле запроса'];
+  }
+
+  if (err.type === 'entity.too.large') {
+    return [413, 'Тело запроса слишком большое'];
   }
 
   // Ошибки слоя бизнес-логики уже несут готовый HTTP-статус.

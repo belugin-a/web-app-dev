@@ -437,6 +437,63 @@ test('роль нельзя выдать себе при регистрации'
   assert.equal(body.user.role, 'user');
 });
 
+test('после серии неудачных входов вход блокируется', async () => {
+  const email = `bruteforce-${Date.now()}@example.com`;
+
+  await request('POST', '/api/auth/register', {
+    name: 'Жертва перебора',
+    email,
+    password: 'password123',
+  });
+
+  let locked = false;
+
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const { status } = await request('POST', '/api/auth/login', {
+      email,
+      password: 'неверный-пароль',
+    });
+
+    if (status === 429) {
+      locked = true;
+      break;
+    }
+
+    assert.equal(status, 401);
+  }
+
+  assert.ok(locked, 'после серии неудачных попыток вход блокируется');
+
+  // Даже верный пароль не пускает, пока блокировка не истекла.
+  const correct = await request('POST', '/api/auth/login', { email, password: 'password123' });
+
+  assert.equal(correct.status, 429);
+});
+
+test('ошибка входа одинакова для существующего и несуществующего e-mail', async () => {
+  const email = `enumeration-${Date.now()}@example.com`;
+
+  await request('POST', '/api/auth/register', {
+    name: 'Проверяемый',
+    email,
+    password: 'password123',
+  });
+
+  const wrongPassword = await request('POST', '/api/auth/login', {
+    email,
+    password: 'неверный-пароль',
+  });
+
+  const unknownEmail = await request('POST', '/api/auth/login', {
+    email: `unknown-${Date.now()}@example.com`,
+    password: 'неверный-пароль',
+  });
+
+  assert.equal(wrongPassword.status, 401);
+  assert.equal(unknownEmail.status, 401);
+  assert.equal(wrongPassword.body.error, unknownEmail.body.error);
+});
+
 /* ------------------------------------------------------------------ */
 /* Пользовательские данные в запросах                                 */
 /* ------------------------------------------------------------------ */

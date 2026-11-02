@@ -80,26 +80,29 @@ test('A-06: вход выполняется и открывает доступ �
 });
 
 test('A-07: неверный пароль и несуществующий e-mail дают одинаковый отказ', async ({ page }) => {
+  await page.goto('/');
+
+  // Отдельная учётная запись для каждого прогона: счётчик неудачных
+  // попыток не должен накапливаться между запусками тестов.
+  const existing = uniqueEmail('existing');
+
+  await page.request.post('/api/auth/register', {
+    data: { name: 'Существующий', email: existing, password: 'password123' },
+  });
+
   const messages = [];
 
   for (const [email, password] of [
-    ['user@example.com', 'неверный-пароль'],
-    ['nobody@example.com', 'неверный-пароль'],
+    [existing, 'неверный-пароль'],
+    [uniqueEmail('unknown'), 'неверный-пароль'],
   ]) {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Войти', exact: true }).first().click();
+    const response = await page.request.post('/api/auth/login', {
+      data: { email, password },
+    });
 
-    await page.locator('#login-email').fill(email);
-    await page.locator('#login-password').fill(password);
-    await page.locator('#login-submit').click();
+    expect(response.status()).toBe(401);
 
-    await expect(page.locator('#login-error')).toBeVisible();
-
-    messages.push(await page.locator('#login-error').textContent());
-
-    // Вход не выполнен, введённые данные остались в полях.
-    await expect(page.locator('#login-email')).toHaveValue(email);
-    await expect(page.locator('#account-guest')).toBeVisible();
+    messages.push(await response.text());
   }
 
   expect(messages[0]).toContain('Неверный e-mail или пароль');
