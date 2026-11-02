@@ -18,7 +18,14 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 2 : undefined,
+
+  // Пять браузеров одновременно нагружают машину, и Firefox не всегда
+  // успевает отрисовать страницу за штатные пять секунд. Запас по времени
+  // и меньшее число параллельных прогонов убирают «мигающие» падения.
+  workers: process.env.CI ? 2 : 3,
+  timeout: 60_000,
+  expect: { timeout: 15_000 },
+
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]],
 
   use: {
