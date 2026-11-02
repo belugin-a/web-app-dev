@@ -23,30 +23,32 @@ export default defineConfig({
 
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
-    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
 
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      // Трейс записывается только здесь: в Firefox и WebKit сохранение
+      // трейса при закрытии контекста даёт ошибку ENOENT, и тест
+      // засчитывается как упавший из-за неё, а не из-за приложения.
+      use: { ...devices['Desktop Chrome'], trace: 'retain-on-failure' },
     },
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { ...devices['Desktop Firefox'], trace: 'off' },
     },
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: { ...devices['Desktop Safari'], trace: 'off' },
     },
     {
       name: 'mobile-chrome',
-      use: { ...devices['Pixel 5'] },
+      use: { ...devices['Pixel 5'], trace: 'off' },
     },
     {
       name: 'mobile-safari',
-      use: { ...devices['iPhone 13'] },
+      use: { ...devices['iPhone 13'], trace: 'off' },
     },
   ],
 

@@ -102,14 +102,14 @@ apiRouter.patch('/tickets/:id', requireAuth, requireRole('admin'), async (req, r
 });
 
 // POST /api/tickets/:id/status — смена статуса с проверкой перехода.
-apiRouter.post('/tickets/:id/status', requireAuth, async (req, res) => {
+apiRouter.post('/tickets/:id/status', requireAuth, requireRole('admin'), async (req, res) => {
   const ticket = await changeStatus(parseId(req.params.id), req.body ?? {});
 
   res.json({ ticket });
 });
 
 // DELETE /api/tickets/:id — удаление заявки (только из статуса «новая»).
-apiRouter.delete('/tickets/:id', requireAuth, async (req, res) => {
+apiRouter.delete('/tickets/:id', requireAuth, requireRole('admin'), async (req, res) => {
   const result = await deleteTicket(parseId(req.params.id));
 
   res.json(result);

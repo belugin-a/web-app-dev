@@ -17,6 +17,7 @@ const state = {
   meta: null,
   tickets: [],
   total: 0,
+  totalAll: 0,
   stats: null,
   user: null,
   filters: {
@@ -74,6 +75,7 @@ const elements = {
   createCancel: document.getElementById('create-cancel'),
   createTitle: document.getElementById('create-title'),
   createDescription: document.getElementById('create-description'),
+  createDescriptionCounter: document.getElementById('create-description-counter'),
   createPriority: document.getElementById('create-priority'),
   createAssignee: document.getElementById('create-assignee'),
   createPriorityHint: document.getElementById('create-priority-hint'),
@@ -86,6 +88,7 @@ const elements = {
   editSubtitle: document.getElementById('edit-subtitle'),
   editTitleInput: document.getElementById('edit-title-input'),
   editDescription: document.getElementById('edit-description'),
+  editDescriptionCounter: document.getElementById('edit-description-counter'),
   editPriority: document.getElementById('edit-priority'),
   editAssignee: document.getElementById('edit-assignee'),
   editPriorityHint: document.getElementById('edit-priority-hint'),
@@ -149,6 +152,17 @@ const PRIORITY_CLASS = {
   'высокий': 'pill--high',
   'критичный': 'pill--critical',
 };
+
+/** Названия ролей для интерфейса: одно на весь экран. */
+const ROLE_NAMES = {
+  user: 'пользователь',
+  admin: 'администратор',
+};
+
+/** Название роли по-русски. */
+function roleName(role) {
+  return ROLE_NAMES[role] ?? role;
+}
 
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
   day: '2-digit',
@@ -248,7 +262,7 @@ function renderAccount() {
   }
 
   elements.accountName.textContent = user.name;
-  elements.accountRole.textContent = user.role === 'admin' ? 'администратор' : 'пользователь';
+  elements.accountRole.textContent = roleName(user.role);
 }
 
 /* ------------------------------------------------------------------ */
@@ -423,13 +437,9 @@ function renderTicket(ticket) {
   node.append(top);
 
   if (ticket.description) {
-    const description = el('p', 'ticket__description');
-
-    // Переносы строк показываем как есть — так описание читается ближе
-    // к исходному тексту, который сотрудник написал в заявке.
-    description.innerHTML = ticket.description.replace(/\r?\n/g, '<br>');
-
-    node.append(description);
+    // Описание выводится текстом: переносы строк сохраняются стилями,
+    // поэтому содержимое заявки не может быть разобрано как разметка.
+    node.append(el('p', 'ticket__description', ticket.description));
   }
 
   const meta = el('div', 'ticket__meta');
@@ -496,8 +506,12 @@ function renderBoard() {
   }
 
   const shown = state.tickets.length;
+  const all = state.totalAll;
+
+  // Когда применены фильтры, показываем, сколько заявок найдено и сколько
+  // всего: иначе «всего 5» читается как «в базе всего пять заявок».
   elements.boardCount.textContent =
-    shown === state.total ? `всего ${state.total}` : `показано ${shown} из ${state.total}`;
+    all && shown < all ? `показано ${shown} из ${all}` : `всего ${all || shown}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -514,6 +528,7 @@ async function loadTickets() {
 
     state.tickets = result.items;
     state.total = result.total;
+    state.totalAll = result.totalAll ?? result.total;
 
     renderBoard();
   } catch (error) {
@@ -640,6 +655,7 @@ function openEditDialog(ticket) {
   elements.editError.hidden = true;
 
   updatePriorityHint(elements.editPriority, elements.editPriorityHint);
+  updateCounter(elements.editDescription, elements.editDescriptionCounter);
 
   elements.editDialog.showModal();
   elements.editTitleInput.focus();
@@ -718,7 +734,7 @@ async function onRegister(event) {
     elements.registerDialog.close();
     elements.registerForm.reset();
 
-    toast(`Учётная запись создана. Роль: ${user.role}`);
+    toast(`Учётная запись создана. Роль: ${roleName(user.role)}`);
     renderAccount();
     await refresh();
   } catch (error) {
@@ -748,7 +764,7 @@ function openProfileDialog() {
     return;
   }
 
-  elements.profileSubtitle.textContent = `Роль: ${user.role === 'admin' ? 'администратор' : 'пользователь'}`;
+  elements.profileSubtitle.textContent = `Роль: ${roleName(user.role)}`;
   elements.profileName.value = user.name;
   elements.profileEmail.value = user.email;
   elements.profileError.hidden = true;
@@ -823,6 +839,19 @@ function updatePriorityHint(select, hint) {
   const hours = state.meta?.slaHours?.[select.value];
 
   hint.textContent = hours ? `Срок обработки: ${hours} ч` : 'Выберите приоритет — станет ясен срок обработки';
+}
+
+/**
+ * Показывает, сколько символов введено и сколько ещё можно добавить.
+ * Без этого счётчика длинный текст молча обрезается полем ввода.
+ */
+function updateCounter(textarea, counter) {
+  const max = Number(textarea.getAttribute('maxlength')) || 0;
+  const used = textarea.value.length;
+  const left = max - used;
+
+  counter.textContent = left < 100 ? `Осталось ${left} из ${max}` : `${used} из ${max}`;
+  counter.classList.toggle('counter--warn', left < 100);
 }
 
 async function loadMeta() {
@@ -969,10 +998,19 @@ function bindEvents() {
     elements.createForm.reset();
     elements.createError.hidden = true;
     updatePriorityHint(elements.createPriority, elements.createPriorityHint);
+    updateCounter(elements.createDescription, elements.createDescriptionCounter);
 
     elements.createDialog.showModal();
     elements.createTitle.focus();
   });
+
+  elements.createDescription.addEventListener('input', () =>
+    updateCounter(elements.createDescription, elements.createDescriptionCounter),
+  );
+
+  elements.editDescription.addEventListener('input', () =>
+    updateCounter(elements.editDescription, elements.editDescriptionCounter),
+  );
 
   elements.createCancel.addEventListener('click', () => elements.createDialog.close());
 

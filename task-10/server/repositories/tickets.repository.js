@@ -75,9 +75,8 @@ function buildFilters({ status, priority, assignee, assigneeUnassigned, ids, sea
   }
 
   if (search) {
-    const pattern = `%${String(search).toLowerCase()}%`;
-
-    conditions.push(`(lower_ru(title) LIKE '${pattern}' OR lower_ru(description) LIKE '${pattern}')`);
+    conditions.push('(lower_ru(title) LIKE :search OR lower_ru(description) LIKE :search)');
+    params.search = `%${String(search).toLowerCase()}%`;
   }
 
   return {
@@ -98,7 +97,7 @@ function buildFilters({ status, priority, assignee, assigneeUnassigned, ids, sea
  * @param {'asc'|'desc'} [filters.sortOrder]
  * @param {number} [filters.limit]
  * @param {number} [filters.offset]
- * @returns {Promise<{ items: object[], total: number }>}
+ * @returns {Promise<{ items: object[], total: number, totalAll: number }>}
  */
 export async function list(filters = {}) {
   const db = getDb();
@@ -112,6 +111,10 @@ export async function list(filters = {}) {
 
   const total = db.prepare(`SELECT COUNT(*) AS count FROM tickets ${where}`).get(params).count;
 
+  // Общее число заявок без учёта фильтров: по нему интерфейс понимает,
+  // сколько заявок скрыто текущим условием.
+  const totalAll = db.prepare('SELECT COUNT(*) AS count FROM tickets').get().count;
+
   const rows = db
     .prepare(
       `SELECT * FROM tickets ${where}
@@ -123,6 +126,7 @@ export async function list(filters = {}) {
   return {
     items: rows.map(toTicket),
     total,
+    totalAll,
   };
 }
 

@@ -10,9 +10,6 @@ import { update as repoUpdate, getById } from '../repositories/users.repository.
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Допустимые роли пользователя. */
-export const ROLES = ['user', 'admin'];
-
 const LIMITS = {
   name: { min: 1, max: 60 },
 };
@@ -67,16 +64,6 @@ export async function updateProfile(id, payload) {
     }
 
     fields.email = email;
-  }
-
-  if (body.role !== undefined) {
-    const role = clean(body.role);
-
-    if (!ROLES.includes(role)) {
-      throw badRequest(`Неизвестная роль: ${role}`);
-    }
-
-    fields.role = role;
   }
 
   if (Object.keys(fields).length === 0) {

@@ -371,6 +371,102 @@ test('PATCH /api/users/me меняет имя', async () => {
   assert.equal(body.user.name, 'Переименованный');
 });
 
+/* ------------------------------------------------------------------ */
+/* Ограничения доступа                                                 */
+/* ------------------------------------------------------------------ */
+
+test('POST /api/tickets/:id/status пользователю с ролью user отдаёт 403', async () => {
+  const created = await request(
+    'POST',
+    '/api/tickets',
+    { title: 'Заявка для проверки прав на смену статуса', priority: 'обычный' },
+    userCookie,
+  );
+
+  const { status, body } = await request(
+    'POST',
+    `/api/tickets/${created.body.ticket.id}/status`,
+    { status: 'в работе' },
+    userCookie,
+  );
+
+  assert.equal(status, 403);
+  assert.match(body.error, /Недостаточно прав/);
+});
+
+test('DELETE /api/tickets/:id пользователю с ролью user отдаёт 403', async () => {
+  const created = await request(
+    'POST',
+    '/api/tickets',
+    { title: 'Заявка для проверки прав на удаление', priority: 'обычный' },
+    userCookie,
+  );
+
+  const { status, body } = await request(
+    'DELETE',
+    `/api/tickets/${created.body.ticket.id}`,
+    undefined,
+    userCookie,
+  );
+
+  assert.equal(status, 403);
+  assert.match(body.error, /Недостаточно прав/);
+});
+
+test('роль нельзя выдать себе изменением профиля', async () => {
+  const { status, body } = await request(
+    'PATCH',
+    '/api/users/me',
+    { name: 'Пользователь', role: 'admin' },
+    userCookie,
+  );
+
+  assert.equal(status, 200);
+  assert.equal(body.user.role, 'user', 'роль остаётся прежней');
+});
+
+test('роль нельзя выдать себе при регистрации', async () => {
+  const { status, body } = await request('POST', '/api/auth/register', {
+    name: 'Самоназначенный',
+    email: `escalated-${Date.now()}@example.com`,
+    password: 'password123',
+    role: 'admin',
+  });
+
+  assert.equal(status, 201);
+  assert.equal(body.user.role, 'user');
+});
+
+/* ------------------------------------------------------------------ */
+/* Пользовательские данные в запросах                                 */
+/* ------------------------------------------------------------------ */
+
+test('кавычка в поиске не ломает запрос', async () => {
+  const { status, body } = await request('GET', `/api/tickets?search=${encodeURIComponent("'")}`);
+
+  assert.equal(status, 200);
+  assert.equal(body.total, 0);
+  assert.deepEqual(body.items, []);
+});
+
+test('конструкция в поиске не расширяет выборку', async () => {
+  const { status, body } = await request(
+    'GET',
+    `/api/tickets?search=${encodeURIComponent("' OR 1=1 OR '")}`,
+  );
+
+  assert.equal(status, 200);
+  assert.equal(body.total, 0);
+  assert.ok(body.totalAll > 0, 'общее число заявок остаётся известным');
+});
+
+test('в списке заявок указан�� общее число заявок', async () => {
+  const { status, body } = await request('GET', '/api/tickets');
+
+  assert.equal(status, 200);
+  assert.equal(body.totalAll, body.total, 'без фильтров общее число совпадает с числом выдачи');
+});
+
 test.after(() => {
   server.close();
   closeDatabase();

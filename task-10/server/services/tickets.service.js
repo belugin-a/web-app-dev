@@ -220,7 +220,7 @@ export async function listTickets(filters = {}) {
     ids = findOverdue(open).map((ticket) => ticket.id);
   }
 
-  const { items, total } = await repoList({
+  const { items, total, totalAll } = await repoList({
     status,
     priority,
     assignee: wantsUnassigned ? '' : assignee,
@@ -236,6 +236,7 @@ export async function listTickets(filters = {}) {
   return {
     items: items.map(decorate),
     total,
+    totalAll,
   };
 }
 
