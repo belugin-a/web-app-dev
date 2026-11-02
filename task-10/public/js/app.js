@@ -225,6 +225,37 @@ function el(tag, className, text) {
   return node;
 }
 
+/**
+ * Показывает сообщение об ошибке в форме.
+ *
+ * Поле, на которое указывает ошибка, помечается как невалидное, а на него
+ * переводится фокус: так сообщение не остаётся незамеченным и его читает
+ * программа экранного доступа.
+ */
+function showFormError(errorNode, message) {
+  errorNode.textContent = message;
+  errorNode.hidden = false;
+
+  const dialog = errorNode.closest('dialog');
+  const field = dialog?.querySelector('input, textarea, select');
+
+  if (field) {
+    field.setAttribute('aria-invalid', 'true');
+    field.focus();
+  }
+}
+
+/** Убирает отметку о невалидности с поля формы. */
+function clearFormError(errorNode) {
+  errorNode.hidden = true;
+  errorNode.textContent = '';
+
+  const dialog = errorNode.closest('dialog');
+  const field = dialog?.querySelector('[aria-invalid="true"]');
+
+  field?.removeAttribute('aria-invalid');
+}
+
 /* ------------------------------------------------------------------ */
 /* Учётная запись                                                      */
 /* ------------------------------------------------------------------ */
@@ -357,9 +388,9 @@ function renderPipeline() {
 
     if (state.filters.status === status) {
       row.classList.add('is-active');
-      row.setAttribute('aria-pressed', 'true');
+      row.setAttribute('aria-current', 'true');
     } else {
-      row.setAttribute('aria-pressed', 'false');
+      row.removeAttribute('aria-current');
     }
 
     row.append(el('td', 'pipeline__name', status));
@@ -636,8 +667,7 @@ async function onCreate(event) {
 
     await refresh();
   } catch (error) {
-    elements.createError.textContent = error.message;
-    elements.createError.hidden = false;
+    showFormError(elements.createError, error.message);
   } finally {
     elements.createSubmit.disabled = false;
   }
@@ -683,8 +713,7 @@ async function onEditSubmit(event) {
 
     await refresh();
   } catch (error) {
-    elements.editError.textContent = error.message;
-    elements.editError.hidden = false;
+    showFormError(elements.editError, error.message);
   }
 }
 
@@ -712,8 +741,7 @@ async function onLogin(event) {
     renderAccount();
     await refresh();
   } catch (error) {
-    elements.loginError.textContent = error.message;
-    elements.loginError.hidden = false;
+    showFormError(elements.loginError, error.message);
   }
 }
 
@@ -738,8 +766,7 @@ async function onRegister(event) {
     renderAccount();
     await refresh();
   } catch (error) {
-    elements.registerError.textContent = error.message;
-    elements.registerError.hidden = false;
+    showFormError(elements.registerError, error.message);
   }
 }
 
@@ -790,8 +817,7 @@ async function onProfileSubmit(event) {
     toast('Профиль сохранён');
     renderAccount();
   } catch (error) {
-    elements.profileError.textContent = error.message;
-    elements.profileError.hidden = false;
+    showFormError(elements.profileError, error.message);
   }
 }
 

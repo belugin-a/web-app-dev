@@ -1,4 +1,5 @@
 import path from 'node:path';
+import fs from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
@@ -6,15 +7,44 @@ const serverDir = path.dirname(fileURLToPath(import.meta.url));
 
 export const rootDir = path.resolve(serverDir, '..');
 
+/**
+ * Ключ подписи сессионных cookie.
+ *
+ * Если ключ не задан переменной окружения, он генерируется один раз и
+ * сохраняется рядом с базой. Благодаря этому сессии не слетают при
+ * перезапуске сервера: пользователю не приходится входить заново.
+ */
+function resolveSessionSecret() {
+  if (process.env.SESSION_SECRET) {
+    return process.env.SESSION_SECRET;
+  }
+
+  const secretFile = path.join(rootDir, 'data', '.session-secret');
+
+  try {
+    const saved = fs.readFileSync(secretFile, 'utf8').trim();
+
+    if (saved) {
+      return saved;
+    }
+  } catch {
+    // Файла ещё нет — создадим ниже.
+  }
+
+  const secret = randomBytes(32).toString('hex');
+
+  fs.mkdirSync(path.dirname(secretFile), { recursive: true });
+  fs.writeFileSync(secretFile, secret, { mode: 0o600 });
+
+  return secret;
+}
+
 export const config = {
   appName: 'task-10-support-tickets',
   port: Number(process.env.PORT) || 3000,
   publicDir: path.join(rootDir, 'public'),
 
-  // Ключ для подписи сессионных cookie. Если переменная окружения не задана,
-  // ключ генерируется заново при каждом запуске: после перезапуска сервера
-  // ранее выданные cookie перестают действовать.
-  sessionSecret: process.env.SESSION_SECRET || randomBytes(32).toString('hex'),
+  sessionSecret: resolveSessionSecret(),
 
   isProduction: process.env.NODE_ENV === 'production',
 

@@ -12,8 +12,8 @@
   --border: #e2e8f0;
   --border-strong: #cbd5e1;
   --text: #0f172a;
-  --muted: #64748b;
-  --faint: #94a3b8;
+  --muted: #475569;
+  --faint: #64748b;
   --accent: #2f6fed;
   --accent-strong: #2456c4;
   --accent-soft: #eff4ff;
@@ -128,6 +128,7 @@ h3 {
 }
 
 .brand__title {
+  margin: 0;
   font-size: 16px;
   font-weight: 650;
   white-space: nowrap;
@@ -139,8 +140,8 @@ h3 {
 .info-btn {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   font-size: 16px;
   line-height: 1;
@@ -304,6 +305,13 @@ h3 {
 .kpi--alert {
   background: var(--danger-soft);
   border-color: var(--danger-border);
+}
+
+/* На тревожном фоне приглушённый текст не набирает нужного контраста,
+   поэтому в этой плитке примечание выводится основным приглушённым цветом. */
+.kpi--alert .kpi__note,
+.kpi--alert .kpi__label {
+  color: var(--muted);
 }
 
 .kpi--alert .kpi__value {
@@ -1099,6 +1107,15 @@ textarea:focus {
 @media (max-width: 1080px) {
   .layout {
     grid-template-columns: 1fr;
+  }
+
+  /* На планшете и уже панель фильтров переносится в несколько строк.
+     Если оставить её липкой, она занимает почти весь экран и заявки
+     под ней не видны — поэтому на этих ширинах панель scrolls вместе
+     со страницей. */
+  .filters {
+    position: static;
+    top: auto;
   }
 }
 

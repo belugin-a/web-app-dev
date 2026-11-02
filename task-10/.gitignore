@@ -6,6 +6,9 @@ data/*.db-journal
 data/*.db-wal
 data/*.db-shm
 
+# Ключ подписи сессий: генерируется при первом запуске
+data/.session-secret
+
 # Артефакты прогонов Playwright
 test-results/
 playwright-report/

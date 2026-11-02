@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Панель службы IT-поддержки: заявки, фильтры, поиск, сроки обработки и учётные записи сотрудников.">
   <title>Заявки в IT-поддержку — ПР10</title>
   <link rel="stylesheet" href="/fonts/fonts.css">
   <link rel="stylesheet" href="/css/style.css">
@@ -26,7 +27,7 @@
             <path d="M8 9h4" />
           </svg>
         </span>
-        <span class="brand__title">Заявки в IT-поддержку</span>
+        <h1 class="brand__title">Заявки в IT-поддержку</h1>
         <button type="button" class="info-btn" id="open-info" aria-label="Как это работает">
           <span aria-hidden="true">ⓘ</span>
         </button>
@@ -229,7 +230,7 @@
       <div class="field">
         <label class="field__label" for="create-title">Тема <span class="req">*</span></label>
         <input type="text" id="create-title" name="title" required minlength="5" maxlength="120"
-          placeholder="Например: не включается проектор в кабинете 2.11">
+          placeholder="Например: не включается проектор в кабинете 2.11" aria-describedby="create-error">
       </div>
 
       <div class="field">
@@ -252,7 +253,7 @@
         </select>
       </div>
 
-      <p class="form__error" id="create-error" hidden></p>
+      <p class="form__error" id="create-error" role="alert" hidden></p>
 
       <div class="dialog__actions">
         <button type="button" class="btn btn--ghost" id="create-cancel">Отмена</button>
@@ -268,7 +269,7 @@
 
       <div class="field">
         <label class="field__label" for="edit-title-input">Тема</label>
-        <input type="text" id="edit-title-input" name="title" required minlength="5" maxlength="120">
+        <input type="text" id="edit-title-input" name="title" required minlength="5" maxlength="120" aria-describedby="edit-error">
       </div>
 
       <div class="field">
@@ -289,7 +290,7 @@
         <p class="hint" id="edit-assignee-hint">—</p>
       </div>
 
-      <p class="form__error" id="edit-error" hidden></p>
+      <p class="form__error" id="edit-error" role="alert" hidden></p>
 
       <div class="dialog__actions">
         <button type="button" class="btn btn--ghost" id="edit-cancel">Отмена</button>
@@ -305,7 +306,7 @@
 
       <div class="field">
         <label class="field__label" for="login-email">E-mail <span class="req">*</span></label>
-        <input type="email" id="login-email" name="email" required autocomplete="username">
+        <input type="email" id="login-email" name="email" required autocomplete="username" aria-describedby="login-error">
       </div>
 
       <div class="field">
@@ -313,7 +314,7 @@
         <input type="password" id="login-password" name="password" required autocomplete="current-password">
       </div>
 
-      <p class="form__error" id="login-error" hidden></p>
+      <p class="form__error" id="login-error" role="alert" hidden></p>
 
       <div class="dialog__actions">
         <button type="button" class="btn btn--ghost" id="login-cancel">Отмена</button>
@@ -329,7 +330,7 @@
 
       <div class="field">
         <label class="field__label" for="register-name">Имя <span class="req">*</span></label>
-        <input type="text" id="register-name" name="name" required maxlength="60" autocomplete="name">
+        <input type="text" id="register-name" name="name" required maxlength="60" autocomplete="name" aria-describedby="register-error">
       </div>
 
       <div class="field">
@@ -344,7 +345,7 @@
         <p class="hint">Минимум 8 символов.</p>
       </div>
 
-      <p class="form__error" id="register-error" hidden></p>
+      <p class="form__error" id="register-error" role="alert" hidden></p>
 
       <div class="dialog__actions">
         <button type="button" class="btn btn--ghost" id="register-cancel">Отмена</button>
@@ -360,7 +361,7 @@
 
       <div class="field">
         <label class="field__label" for="profile-name">Имя</label>
-        <input type="text" id="profile-name" name="name" required maxlength="60">
+        <input type="text" id="profile-name" name="name" required maxlength="60" aria-describedby="profile-error">
       </div>
 
       <div class="field">
@@ -368,7 +369,7 @@
         <input type="email" id="profile-email" name="email" required>
       </div>
 
-      <p class="form__error" id="profile-error" hidden></p>
+      <p class="form__error" id="profile-error" role="alert" hidden></p>
 
       <div class="dialog__actions">
         <button type="button" class="btn btn--ghost" id="profile-cancel">Отмена</button>
